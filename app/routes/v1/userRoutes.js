@@ -12,6 +12,7 @@ router.get("/", (req, res) => {
 });
 router.post("/signup", [
   UserMiddleware.validateUser,
+  UserMiddleware.uniqueUser,
   UserController.createUser,
 ]);
 

@@ -4,10 +4,6 @@ const nodemailer = require("nodemailer");
  * @class EmailHelper
  */
 class EmailHelper {
-  constructor() {
-    senderEmail = "info@walletsystemcom";
-  }
-
   /**
    *
    * @param {Object} param0 - Object containing user emai, subject and text
@@ -24,7 +20,7 @@ class EmailHelper {
     });
     try {
       let info = await transport.sendMail({
-        from: this.senderEmail, // sender address
+        from: "info@walletsystem.com", // sender address
         to: email, // list of receivers
         subject: subject, // Subject line
         text: text, // plain text body

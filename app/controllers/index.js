@@ -1,9 +1,7 @@
 import UserController from "./userController.js";
 
-const { createUser } = UserController;
-
 const Controllers = {
-  createUser,
+  UserController,
 };
 
 export default Controllers;

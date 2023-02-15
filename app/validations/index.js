@@ -1,4 +1,4 @@
-import userSignUpSchema from "./userValidation.js";
+import { userSignUpSchema } from "./userValidation";
 
 const validations = {
   userSignUpSchema,

@@ -1,8 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
-import appConfig from "./config/app.js";
+import appConfig from "./config/app";
 
 const app = express();
+app.use(express.json());
 appConfig(app);
 const PORT = process.env.PORT || 3000;
 

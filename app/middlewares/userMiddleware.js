@@ -4,18 +4,19 @@ const { userSignUpSchema } = userValidations;
 
 class UserMiddleware {
   static validateUser(req, res, next) {
+    // const { error, value } = userSignUpSchema.validate
     try {
       const { error, value } = userSignUpSchema.validate(req.body, {
         abortEarly: false,
       });
 
       if (error) {
-        return error.details;
+        res.status(400).send(error.details);
       }
 
       next();
     } catch (err) {
-      return err;
+      res.status(500).send({ error: err });
     }
   }
 }

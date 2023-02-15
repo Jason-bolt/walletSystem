@@ -1,7 +1,7 @@
-import user from "./userMiddleware.js";
+import UserMiddleware from "./userMiddleware.js";
 
 const middlewares = {
-  user,
+  UserMiddleware,
 };
 
 export default middlewares;

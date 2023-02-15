@@ -11,7 +11,7 @@ const appConfig = (app) => {
   app.use(morgan("combined"));
   app.use(cors());
   app.use(helmet());
-  app.use("/v1", userRoute);
+  app.use("/api/v1/user", userRoute);
 };
 
 export default appConfig;

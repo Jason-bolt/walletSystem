@@ -2,7 +2,6 @@
   "name": "walletsystem",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -r esm ."
@@ -11,11 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "esm": "^3.2.25",
     "express": "^4.18.2",
     "helmet": "^6.0.1",
+    "joi": "^17.7.1",
     "mongoose": "^6.9.1",
     "morgan": "^1.10.0"
   },

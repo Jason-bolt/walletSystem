@@ -2,10 +2,10 @@ import Transfer from "./Transfer";
 import User from "./User";
 import Funding from "./Funding";
 
-const schemas = {
+const Schemas = {
   Transfer,
   User,
   Funding,
 };
 
-export default schemas;
+export default Schemas;

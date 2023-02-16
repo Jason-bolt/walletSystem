@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
  * @description - Signup route, generates otp and sends an email to the user
  */
 router.post("/signup", [
-  UserMiddleware.validateUser,
+  UserMiddleware.validateSignUpFields,
   UserMiddleware.uniqueUser,
   UserController.createUser,
 ]);
@@ -28,6 +28,17 @@ router.post("/signup", [
  */
 router.post("/verify_otp", UserController.verifyOtp);
 
+/**
+ * @description - Resend OTP
+ */
 router.post("/resend_otp", UserController.regenerateOtp);
+
+/**
+ * @description - Log user in by creating jwt
+ */
+router.post("/login", [
+  UserMiddleware.validateLoginFields,
+  UserController.login,
+]);
 
 export default router;

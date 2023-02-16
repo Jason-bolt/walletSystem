@@ -1,6 +1,7 @@
 import Schemas from "../db/schema";
 import bcrypt from "bcrypt";
 import helpers from "../../config/helpers";
+import jwt from "jsonwebtoken";
 
 const { EmailHelper, OtpHelper } = helpers;
 
@@ -66,6 +67,7 @@ class UserService {
   /**
    * @static
    * @async
+   * @memberof UserService
    * @param {String} token - Token received from user response
    * @param {ObjectID} user_id - User id of mongoose objectID
    * @returns {Promise<Boolean|Object}
@@ -105,6 +107,7 @@ class UserService {
   /**
    * @static
    * @async
+   * @memberof UserService
    * @param {ObjectID} user_id - The user id, an instance of mongose ObjectID
    * @param {String} email - Email of the user
    * @returns {Promise<Boolean|Object}
@@ -138,6 +141,51 @@ class UserService {
         return { error: emailSent.error };
       }
       return true;
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserService
+   * @param {Object} user - User object containing email and password
+   * @returns {Promise<Object>} - Error or tokens
+   */
+  static async login(user) {
+    try {
+      const { email, password } = user;
+      const existingUser = await User.findOne({ email });
+      if (!existingUser) {
+        return { error: "Username or password is incorrect!" };
+      } else {
+        const passwordMatch = await bcrypt.compare(
+          password,
+          existingUser.password
+        );
+        if (!passwordMatch) {
+          return { error: "Username or password is incorrect!" };
+        }
+        const data = {
+          id: existingUser._id,
+          email: existingUser.email,
+          firstName: existingUser.firstName,
+          lastName: existingUser.lastName,
+        };
+        console.log(passwordMatch);
+        const jwt_access_token = jwt.sign(data, process.env.JWT_SECRET, {
+          expiresIn: process.env.JWT_TOKEN_EXPIRY,
+        });
+        const jwt_refresh_token = jwt.sign(data, process.env.JWT_SECRET, {
+          expiresIn: process.env.JWT_TOKEN_EXPIRY,
+        });
+
+        return {
+          access_token: jwt_access_token,
+          refresh_token: jwt_refresh_token,
+        };
+      }
     } catch (err) {
       return { error: err };
     }

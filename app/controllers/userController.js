@@ -12,6 +12,7 @@ class UserController {
   /**
    * @static
    * @async
+   * @memberof UserController
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
    * @returns JSON
@@ -42,6 +43,7 @@ class UserController {
   /**
    * @static
    * @async
+   * @memberof UserController
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
    * @returns JSON
@@ -84,6 +86,7 @@ class UserController {
   /**
    * @static
    * @async
+   * @memberof UserController
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
    * @returns JSON
@@ -117,6 +120,38 @@ class UserController {
       return Responses.success(res, {
         data: null,
         message: "New token sent to email!",
+      });
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserController
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns JSON
+   */
+  static async login(req, res) {
+    try {
+      const tokens = await UserService.login(req.body);
+      if (tokens.error) {
+        return Responses.error(res, {
+          data: tokens.error,
+          message: "Error generating tokens!",
+          code: 400,
+        });
+      }
+
+      return Responses.success(res, {
+        data: tokens,
+        message: "User logged in successfully!",
       });
     } catch (err) {
       return Responses.error(res, {

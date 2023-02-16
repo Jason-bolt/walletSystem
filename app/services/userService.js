@@ -2,9 +2,9 @@ import Schemas from "../db/schema";
 import bcrypt from "bcrypt";
 import helpers from "../../config/helpers";
 
-const { EmailHelper } = helpers;
+const { EmailHelper, OtpHelper } = helpers;
 
-const { User } = Schemas;
+const { User, Otp } = Schemas;
 
 /**
  * @class UserService
@@ -20,7 +20,6 @@ class UserService {
   static async createUser(user) {
     try {
       const { firstName, lastName, email, phone, password } = user;
-      console.log("Here");
       const hashed_password = await bcrypt.hash(password, 10);
       const newUser = await User.create({
         firstName: firstName,
@@ -29,18 +28,37 @@ class UserService {
         phone: phone,
         password: hashed_password,
         pin: null,
-        otp: 1234, // TODO - Make this unique with speakeasyJs
       });
 
+      // Generatting account confirmatory otp
+      const otpObj = await OtpHelper.generate();
+
+      if (otpObj.error) {
+        console.log(otpObj);
+        throw Error(otpObj.error);
+      } else {
+        // Adding the user id and token to otp table
+        await Otp.create({
+          user_id: newUser._id,
+          otp: otpObj.hashed_token,
+        });
+      }
+
+      // Sending email to user with token
       const emailSent = await EmailHelper.sendMail({
         email: newUser.email,
         subject: "Registration successful",
-        text: "This is a message",
+        text: `Account created, your confirmatory code is ${otpObj.token}`,
       });
       if (emailSent.error) {
-        return { error: emailSent.error };
+        throw Error(emailSent.error);
       }
-      return newUser;
+
+      const userObj = {
+        id: newUser._id,
+        email: newUser.email,
+      };
+      return { userObj };
     } catch (err) {
       return { error: err };
     }

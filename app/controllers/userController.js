@@ -1,5 +1,7 @@
 import Services from "../services";
-import Responses from "../../config/helpers/responses";
+import helpers from "../../config/helpers";
+
+const { Responses } = helpers;
 
 const { UserService } = Services;
 

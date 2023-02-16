@@ -26,10 +26,7 @@ const user = new Schema({
   pin: {
     type: Number,
   },
-  otp: {
-    type: String,
-  },
-  verified: {
+  isVerified: {
     type: Boolean,
     default: false,
   },

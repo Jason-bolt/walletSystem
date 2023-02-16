@@ -161,6 +161,40 @@ class UserController {
       });
     }
   }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserController
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns JSON
+   */
+  static async sendPasswordResetLink(req, res) {
+    try {
+      const user = req.user;
+      const link = await UserService.sendPasswordResetLink(user);
+
+      if (link.error) {
+        return Responses.error(res, {
+          data: link.error,
+          message: "Error sending password reset link!",
+          code: 400,
+        });
+      }
+
+      return Responses.success(res, {
+        data: link,
+        message: "Reet link sent to email!",
+      });
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
+    }
+  }
 }
 
 export default UserController;

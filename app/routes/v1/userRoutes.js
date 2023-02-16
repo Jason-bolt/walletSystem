@@ -43,6 +43,9 @@ router.post("/login", [
 
 // router.post("/check", [AuthMiddleware.checkJwtToken]);
 
-
+router.post("/reset-password", [
+  UserMiddleware.userExists,
+  UserController.sendPasswordResetLink,
+]);
 
 export default router;

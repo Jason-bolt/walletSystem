@@ -3,12 +3,13 @@ import bcrypt from "bcrypt";
 import helpers from "../../config/helpers";
 import jwt from "jsonwebtoken";
 import middlewares from "../middlewares";
+import crypto from "crypto";
 
 const { AuthMiddleware } = middlewares;
 
 const { EmailHelper, OtpHelper } = helpers;
 
-const { User, Otp } = Schemas;
+const { User, Otp, Forgot_Password } = Schemas;
 
 /**
  * @class UserService
@@ -191,6 +192,47 @@ class UserService {
           refresh_token: jwt_refresh_token,
         };
       }
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserService
+   * @param {Object} user - User object containing email and password
+   * @returns {Promise<Object|link>} - Error or tokens
+   */
+  static async sendPasswordResetLink(user) {
+    try {
+      let tokenRecord = await Forgot_Password.findOne({ user_id: user._id });
+
+      let token;
+      if (!tokenRecord.token) {
+        token = crypto.randomBytes(32).toString("hex");
+        await Forgot_Password.create({
+          user_id: user._id,
+          token,
+        });
+      } else {
+        token = tokenRecord.token;
+      }
+
+      const link = `${process.env.BASE_URL}/${user._id}/${token}`;
+
+      const emailBody = {
+        email: user.email,
+        subject: "Reset Password Link",
+        text: `Reset password with this link: ${link}`,
+      };
+      const emailSent = await EmailHelper.sendMail(emailBody);
+
+      if (emailSent.error) {
+        return { error: emailSent.error };
+      }
+
+      return link;
     } catch (err) {
       return { error: err };
     }

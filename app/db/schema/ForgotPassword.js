@@ -3,7 +3,7 @@ import User from "./User";
 
 const { Schema } = mongoose;
 
-const otp_records = new Schema({
+const forgot_password = new Schema({
   user_id: {
     type: Schema.Types.ObjectId,
     ref: User,
@@ -22,6 +22,6 @@ const otp_records = new Schema({
   },
 });
 
-const Otp = mongoose.model("Otp", otp_records);
+const Forgot_Password = mongoose.model("Forgot_Password", forgot_password);
 
-export default Otp;
+export default Forgot_Password;

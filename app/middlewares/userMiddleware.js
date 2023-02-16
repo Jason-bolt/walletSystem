@@ -2,7 +2,7 @@ import userValidations from "../validations";
 import Responses from "../../config/helpers/responses";
 import User from "../db/schema/User";
 
-const { userSignUpSchema, userLoginSchema } = userValidations;
+const { userSignUpSchema, userLoginSchema, emailSchema } = userValidations;
 
 /**
  * @class UserMiddleware
@@ -45,7 +45,7 @@ class UserMiddleware {
    */
   static validateSignUpFields(req, res, next) {
     try {
-      const { error, value } = userSignUpSchema.validate(req.body, {
+      const { error } = userSignUpSchema.validate(req.body, {
         abortEarly: false,
       });
 
@@ -73,7 +73,7 @@ class UserMiddleware {
    */
   static async validateLoginFields(req, res, next) {
     try {
-      const { error, value } = userLoginSchema.validate(req.body, {
+      const { error } = userLoginSchema.validate(req.body, {
         abortEarly: false,
       });
 
@@ -87,6 +87,46 @@ class UserMiddleware {
 
       next();
     } catch (err) {
+      Responses.error(res, { data: err, message: "Server error!", code: 500 });
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserMiddleware
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @param {Next} next - callback function that runs when middleware method ends
+   */
+  static async userExists(req, res, next) {
+    try {
+      const { error } = emailSchema.validate(req.body, {
+        abortEarly: false,
+      });
+
+      if (error) {
+        Responses.error(res, {
+          data: error.details,
+          message: "Email is missing!",
+          code: 404,
+        });
+      }
+      const email = req.body.email;
+
+      const user = await User.findOne({ email });
+      if (!user) {
+        Responses.error(res, {
+          data: error.details,
+          message: "User does not exist!",
+          code: 400,
+        });
+      }
+
+      req.user = user;
+
+      next();
+    } catch (error) {
       Responses.error(res, { data: err, message: "Server error!", code: 500 });
     }
   }

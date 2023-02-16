@@ -28,31 +28,24 @@ class OtpHelper {
   /**
    * @static
    * @param {String} token - This is the raw token inputted y the user
-   * @param {String} otp - This is the otp coming from the Otp database
+   * @param {Object} otpRecord - This is the otpRecord for the user
    * @param {ObjectID} user_id - User object id from mongoose instance
    * @returns {Object | Boolean}
    */
-  static async verfify(token, otp, user_id) {
+  static async verify(token, otpRecord) {
     try {
-      if (!token) {
-        throw Error("Missing token!");
+      if (Date.now() > otpRecord.expiredAt) {
+        return { error: "Token has expired, please request a new one!" };
       } else {
-        const userOtpRecord = await Otp.findOne({ user_id });
-        if (!userOtpRecord) {
-          throw Error("Account has already been verified, continue to login");
+        const verified_token = await bcrypt.compare(token, otpRecord.otp);
+        if (!verified_token) {
+          return { error: "Wrong token passed!" };
         } else {
-          if (Date.now() > userOtpRecord.expiredAt) {
-            throw Error("Token has expired, please request a new one!");
-          } else {
-            const verified_token = await bcrypt.compare(token, otp);
-            if (!verified_token) {
-              throw Error("Wrong token passed!");
-            } else {
-              const deletedOtpRecord = await Otp.deleteMany({ user_id });
-              if (deletedOtpRecord) {
-                return true;
-              }
-            }
+          const deletedOtpRecord = await Otp.deleteMany({
+            user_id: otpRecord.user_id,
+          });
+          if (deletedOtpRecord) {
+            return true;
           }
         }
       }

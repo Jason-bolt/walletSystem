@@ -34,8 +34,7 @@ class UserService {
       const otpObj = await OtpHelper.generate();
 
       if (otpObj.error) {
-        console.log(otpObj);
-        throw Error(otpObj.error);
+        return { error: otpObj.error };
       } else {
         // Adding the user id and token to otp table
         await Otp.create({
@@ -51,7 +50,7 @@ class UserService {
         text: `Account created, your confirmatory code is ${otpObj.token}`,
       });
       if (emailSent.error) {
-        throw Error(emailSent.error);
+        return { error: emailSent.error };
       }
 
       const userObj = {
@@ -59,6 +58,45 @@ class UserService {
         email: newUser.email,
       };
       return { userObj };
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @param {String} token - Token received from user response
+   * @param {ObjectID} user_id - User id of mongoose objectID
+   * @returns {Promise<Boolean|Object}
+   */
+  static async verifyOtp(token, user_id) {
+    try {
+      const otpRecord = await Otp.findOne({ user_id });
+      if (!otpRecord) {
+        return {
+          error: "Account has already been verified, continue to login",
+        };
+      } else {
+        const tokenVerified = await OtpHelper.verify(token, otpRecord);
+
+        if (tokenVerified.error) {
+          console.log("Here");
+          return { error: tokenVerified.error };
+        } else {
+          console.log(user_id);
+          const updatedUser = await User.updateOne(
+            { _id: user_id },
+            { isVerified: true }
+          );
+          console.log(updatedUser);
+          if (!updatedUser.acknowledged) {
+            return { error: "Could not update user!" };
+          } else {
+            return updatedUser.acknowledged;
+          }
+        }
+      }
     } catch (err) {
       return { error: err };
     }

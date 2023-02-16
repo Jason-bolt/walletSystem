@@ -38,6 +38,35 @@ class UserController {
       Responses.error(res, { data: err, message: "Server Error!", code: 500 });
     }
   }
+
+  static async verifyOtp(req, res) {
+    try {
+      const { user_id, token } = req.body;
+      if (!token || !user_id) {
+        Responses.error(res, {
+          data: null,
+          message: "Token or user ID is missing!",
+          code: 404,
+        });
+      } else {
+        const tokenVerified = await UserService.verifyOtp(token, user_id);
+        if (tokenVerified.error) {
+          Responses.error(res, {
+            data: tokenVerified.error,
+            message: "Error verifying token!",
+            code: 400,
+          });
+        } else {
+          Responses.success(res, {
+            data: null,
+            message: "Account verified successfully!",
+          });
+        }
+      }
+    } catch (err) {
+      Responses.error(res, { data: err, message: "Server Error!", code: 500 });
+    }
+  }
 }
 
 export default UserController;

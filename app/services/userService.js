@@ -2,6 +2,9 @@ import Schemas from "../db/schema";
 import bcrypt from "bcrypt";
 import helpers from "../../config/helpers";
 import jwt from "jsonwebtoken";
+import middlewares from "../middlewares";
+
+const { AuthMiddleware } = middlewares;
 
 const { EmailHelper, OtpHelper } = helpers;
 
@@ -160,13 +163,15 @@ class UserService {
       if (!existingUser) {
         return { error: "Username or password is incorrect!" };
       } else {
-        const passwordMatch = await bcrypt.compare(
+        const passwordMatch = await AuthMiddleware.passwordsMath(
           password,
           existingUser.password
         );
+
         if (!passwordMatch) {
           return { error: "Username or password is incorrect!" };
         }
+
         const data = {
           id: existingUser._id,
           email: existingUser.email,

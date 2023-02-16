@@ -2,7 +2,7 @@ import { Router } from "express";
 import Controllers from "../../controllers";
 import middlewares from "../../middlewares";
 
-const { UserMiddleware } = middlewares;
+const { UserMiddleware, AuthMiddleware } = middlewares;
 const { UserController } = Controllers;
 
 const router = new Router();
@@ -40,5 +40,9 @@ router.post("/login", [
   UserMiddleware.validateLoginFields,
   UserController.login,
 ]);
+
+// router.post("/check", [AuthMiddleware.checkJwtToken]);
+
+
 
 export default router;

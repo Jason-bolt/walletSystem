@@ -26,6 +26,8 @@ router.post("/signup", [
 /**
  * @description - Verification of otp from user
  */
-router.post("/verify_otp", [UserController.verifyOtp]);
+router.post("/verify_otp", UserController.verifyOtp);
+
+router.post("/resend_otp", UserController.regenerateOtp);
 
 export default router;

@@ -18,7 +18,7 @@ const otp_records = new Schema({
   },
   expireAt: {
     type: Date,
-    default: Date.now() + 3600000, // Plus 10 minutes (600000), 1 hour (3600000)
+    default: Date.now() + 600000, // Plus 10 minutes (600000), 1 hour (3600000)
   },
 });
 

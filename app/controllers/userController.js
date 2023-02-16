@@ -39,32 +39,91 @@ class UserController {
     }
   }
 
+  /**
+   * @static
+   * @async
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns JSON
+   */
   static async verifyOtp(req, res) {
     try {
       const { user_id, token } = req.body;
-      if (!token || !user_id) {
+      if (!token) {
         Responses.error(res, {
           data: null,
-          message: "Token or user ID is missing!",
+          message: "Token is missing!",
           code: 404,
         });
+      }
+      if (!user_id) {
+        Responses.error(res, {
+          data: null,
+          message: "User ID is missing!",
+          code: 404,
+        });
+      }
+      const tokenVerified = await UserService.verifyOtp(token, user_id);
+      if (tokenVerified.error) {
+        Responses.error(res, {
+          data: tokenVerified.error,
+          message: "Error verifying token!",
+          code: 400,
+        });
       } else {
-        const tokenVerified = await UserService.verifyOtp(token, user_id);
-        if (tokenVerified.error) {
-          Responses.error(res, {
-            data: tokenVerified.error,
-            message: "Error verifying token!",
-            code: 400,
-          });
-        } else {
-          Responses.success(res, {
-            data: null,
-            message: "Account verified successfully!",
-          });
-        }
+        Responses.success(res, {
+          data: null,
+          message: "Account verified successfully!",
+        });
       }
     } catch (err) {
       Responses.error(res, { data: err, message: "Server Error!", code: 500 });
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns JSON
+   */
+  static async regenerateOtp(req, res) {
+    try {
+      const { user_id, email } = req.body;
+      if (!user_id) {
+        return Responses.error(res, {
+          data: null,
+          message: "User ID is missing!",
+          code: 404,
+        });
+      }
+      if (!email) {
+        return Responses.error(res, {
+          data: null,
+          message: "Email is missing!",
+          code: 404,
+        });
+      }
+      const newToken = await UserService.regenerateOtp(user_id, email);
+
+      if (newToken.error) {
+        return Responses.error(res, {
+          data: newToken.error,
+          message: "Error sending new token!",
+          code: 404,
+        });
+      }
+      return Responses.success(res, {
+        data: null,
+        message: "New token sent to email!",
+      });
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
     }
   }
 }

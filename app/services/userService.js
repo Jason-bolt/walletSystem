@@ -47,7 +47,7 @@ class UserService {
       const emailSent = await EmailHelper.sendMail({
         email: newUser.email,
         subject: "Registration successful",
-        text: `Account created, your confirmatory code is ${otpObj.token}`,
+        text: `Account created, your confirmatory code is ${otpObj.token}. It will expire in 10 minutes.`,
       });
       if (emailSent.error) {
         return { error: emailSent.error };
@@ -97,6 +97,47 @@ class UserService {
           }
         }
       }
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @param {ObjectID} user_id - The user id, an instance of mongose ObjectID
+   * @param {String} email - Email of the user
+   * @returns {Promise<Boolean|Object}
+   */
+  static async regenerateOtp(user_id, email) {
+    try {
+      // Deleting existing records in the otp database
+      await Otp.deleteMany({ user_id });
+
+      // Generatting account confirmatory otp
+      const otpObj = await OtpHelper.generate();
+
+      if (otpObj.error) {
+        return { error: otpObj.error };
+      } else {
+        // Adding the user id and token to otp table
+        await Otp.create({
+          user_id,
+          otp: otpObj.hashed_token,
+        });
+      }
+
+      // Sending email to user with token
+      const emailSent = await EmailHelper.sendMail({
+        email,
+        subject: "Confirmatory code resent",
+        text: `Your new confirmatory code is ${otpObj.token}. It will expire in 10 minutes.`,
+      });
+      console.log(email);
+      if (emailSent.error) {
+        return { error: emailSent.error };
+      }
+      return true;
     } catch (err) {
       return { error: err };
     }

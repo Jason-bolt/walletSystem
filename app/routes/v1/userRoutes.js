@@ -71,6 +71,9 @@ router.post("/create-pin", [
   UserController.createPin,
 ]);
 
-router.post("/accountBalance")
+router.post("/account-balance", [
+  AuthMiddleware.auth,
+  UserController.getAccountBalance,
+]);
 
 export default router;

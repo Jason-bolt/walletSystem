@@ -239,7 +239,7 @@ class UserMiddleware {
   static async validPin(req, res, next) {
     try {
       const pin = req.body.pin;
-      const { error } = pinSchema.validate({pin}, { abortEarly: false });
+      const { error } = pinSchema.validate({ pin }, { abortEarly: false });
 
       if (error) {
         return Responses.error(res, {
@@ -248,8 +248,8 @@ class UserMiddleware {
           code: 404,
         });
       }
+
       req.pin = pin;
-      console.log("Here");
       next();
     } catch (err) {
       return Responses.error(res, {

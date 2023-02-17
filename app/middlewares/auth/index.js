@@ -29,12 +29,13 @@ class AuthMiddleware {
       let error = {};
       jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
         if (err) {
-          error = err;
+          error = {error: err};
+        }else{
+          req.user = data;
         }
-        req.user = data;
       });
 
-      if (error.length == 0) {
+      if (error.error) {
         return Responses.error(res, {
           data: error,
           message: "Token is incorrect or expired!",

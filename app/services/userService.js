@@ -272,6 +272,13 @@ class UserService {
     }
   }
 
+  /**
+   * @static
+   * @await
+   * @memberof UserService
+   * @param {Object} userID - User ID
+   * @returns {Promise<Boolean|Object>}
+   */
   static async createAccount(userID) {
     try {
       // Create account number
@@ -305,6 +312,11 @@ class UserService {
     try {
       const hashed_pin = await bcrypt.hash(pin, 12);
 
+      const existingAccount = await Account.findOne({ user: user_id });
+      if (existingAccount) {
+        return { error: "Account already created!" };
+      }
+
       const updated = await User.updateOne(
         { _id: user_id },
         { pin: hashed_pin }
@@ -320,6 +332,30 @@ class UserService {
       } else {
         return { error: "Could not update user pin!" };
       }
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserService
+   * @param {ObjectID} user_id - User ID an object of mongoose ObjectID
+   * @returns {Promise<Object>}
+   */
+  static async getAccountBalance(user_id) {
+    try {
+      const DOLLAR_FACTOR = 0.0022;
+      const account = await Account.findOne({ user: user_id });
+      if (!account) {
+        return { error: "Account could not be retrieved!" };
+      }
+      let { balance } = account;
+      balance = parseInt(balance);
+      const naira_balance = balance;
+      const dollar_balance = balance * DOLLAR_FACTOR;
+      return { naira_balance, dollar_balance };
     } catch (err) {
       return { error: err };
     }

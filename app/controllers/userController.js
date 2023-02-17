@@ -243,6 +243,7 @@ class UserController {
       const user_id = req.user.id;
       const pin = req.pin;
 
+      console.log("Here");
       const pinCreated = await UserService.createPin(pin, user_id);
 
       if (pinCreated.error) {
@@ -256,6 +257,31 @@ class UserController {
       return Responses.success(res, {
         data: null,
         message: "Pin created, account has been activated!",
+      });
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
+    }
+  }
+
+  static async getAccountBalance(req, res) {
+    try {
+      const { id } = req.user;
+      const balances = await UserService.getAccountBalance(id);
+      if (balances.error) {
+        return Responses.error(res, {
+          data: balances.error,
+          message: "Error getting account balance!",
+          code: 400,
+        });
+      }
+
+      return Responses.success(res, {
+        data: balances,
+        message: "Balanece retrieved!",
       });
     } catch (err) {
       return Responses.error(res, {

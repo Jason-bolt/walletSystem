@@ -8,7 +8,8 @@ const account = new Schema({
     type: Number,
     required: true,
   },
-  amount: {
+  // Amount is always in Naira. Make calculations for dollar value
+  balance: {
     type: Number,
     default: 0.0,
   },

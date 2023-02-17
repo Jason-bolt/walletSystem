@@ -12,10 +12,18 @@ const transfer = new Schema({
     type: Number,
     default: 0.0,
   },
-  account: {
+  senderAccount: {
     type: Number,
     ref: Account,
-  }
+  },
+  RecepientAccount: {
+    type: Number,
+    ref: Account,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 const Transfer = mongoose.model("Transfer", transfer);

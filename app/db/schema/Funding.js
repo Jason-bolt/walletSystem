@@ -16,6 +16,10 @@ const funding = new Schema({
     type: Schema.Types.ObjectId,
     ref: User,
   },
+  createdAt: {
+    type: Date,
+    
+  }
 });
 
 const Funding = mongoose.model("Funding", funding);

@@ -41,13 +41,19 @@ router.post("/login", [
   UserController.login,
 ]);
 
-// router.post("/check", [AuthMiddleware.checkJwtToken]);
-
+/**
+ * @description - Ruote to reset password
+ */
 router.post("/reset-password", [
   UserMiddleware.userExists,
   UserController.sendPasswordResetLink,
 ]);
 
+/**
+ * @description - Route to change password
+ * @param {String} user_id - User ID
+ * @param {String} token - Token to ensure uniqueness and validity of request
+ */
 router.post("/:user_id/:token", [
   UserMiddleware.validResetPassword,
   UserController.resetPassword,

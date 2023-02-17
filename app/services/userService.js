@@ -9,7 +9,7 @@ const { AuthMiddleware } = middlewares;
 
 const { EmailHelper, OtpHelper } = helpers;
 
-const { User, Otp, Forgot_Password } = Schemas;
+const { User, Otp, Forgot_Password, Account } = Schemas;
 
 /**
  * @class UserService
@@ -272,6 +272,27 @@ class UserService {
     }
   }
 
+  static async createAccount(userID) {
+    try {
+      // Create account number
+      const accountNumber = Math.floor(
+        Math.random() * 90000000000 + 10000000000
+      );
+      const accountCreated = await Account.create({
+        accountNumber,
+        user: userID,
+      });
+
+      if (accountCreated) {
+        return true;
+      } else {
+        return { error: "Could not create account!" };
+      }
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
   /**
    * @static
    * @async
@@ -290,7 +311,12 @@ class UserService {
       );
 
       if (updated.acknowledged) {
-        return true;
+        const accountCreated = await UserService.createAccount(user_id);
+        if (accountCreated.error) {
+          return { error: accountCreated.error };
+        } else {
+          return true;
+        }
       } else {
         return { error: "Could not update user pin!" };
       }

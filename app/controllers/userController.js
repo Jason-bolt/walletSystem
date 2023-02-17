@@ -255,7 +255,7 @@ class UserController {
 
       return Responses.success(res, {
         data: null,
-        message: "Pin has been created!",
+        message: "Pin created, account has been activated!",
       });
     } catch (err) {
       return Responses.error(res, {

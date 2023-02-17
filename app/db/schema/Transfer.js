@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import User from "./User.js";
+import Account from "./Account";
 
 const { Schema } = mongoose;
 
@@ -10,16 +10,12 @@ const transfer = new Schema({
   },
   amount: {
     type: Number,
-    required: true,
+    default: 0.0,
   },
-  accountNumber: {
+  account: {
     type: Number,
-    required: true,
-  },
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: User,
-  },
+    ref: Account,
+  }
 });
 
 const Transfer = mongoose.model("Transfer", transfer);

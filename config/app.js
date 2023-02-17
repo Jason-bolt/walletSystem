@@ -12,6 +12,7 @@ const appConfig = (app) => {
   app.use(cors());
   app.use(helmet());
   app.use("/api/v1/user", userRoute);
+  app.use("/api/v1/user/account", userRoute);
 };
 
 export default appConfig;

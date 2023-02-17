@@ -266,31 +266,6 @@ class UserController {
       });
     }
   }
-
-  static async getAccountBalance(req, res) {
-    try {
-      const { id } = req.user;
-      const balances = await UserService.getAccountBalance(id);
-      if (balances.error) {
-        return Responses.error(res, {
-          data: balances.error,
-          message: "Error getting account balance!",
-          code: 400,
-        });
-      }
-
-      return Responses.success(res, {
-        data: balances,
-        message: "Balanece retrieved!",
-      });
-    } catch (err) {
-      return Responses.error(res, {
-        data: err,
-        message: "Server Error!",
-        code: 500,
-      });
-    }
-  }
 }
 
 export default UserController;

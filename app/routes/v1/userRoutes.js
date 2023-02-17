@@ -3,7 +3,7 @@ import Controllers from "../../controllers";
 import middlewares from "../../middlewares";
 
 const { UserMiddleware, AuthMiddleware } = middlewares;
-const { UserController } = Controllers;
+const { UserController, AccountController } = Controllers;
 
 const router = new Router();
 
@@ -71,9 +71,5 @@ router.post("/create-pin", [
   UserController.createPin,
 ]);
 
-router.post("/account-balance", [
-  AuthMiddleware.auth,
-  UserController.getAccountBalance,
-]);
 
 export default router;

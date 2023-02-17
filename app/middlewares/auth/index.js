@@ -1,26 +1,11 @@
 import jwt from "jsonwebtoken";
 import Responses from "../../../config/helpers/responses";
+import bcrypt from "bcrypt";
 
 /**
  * @class AuthMiddleware
  */
 class AuthMiddleware {
-  /**
-   * @static
-   * @async
-   * @memberof AuthMiddleware
-   * @param {String} password - User inputed password
-   * @param {String} hash - Hashed password from the user database
-   * @returns {Promise<Object>}
-   */
-  static async passwordsMath(password, hash) {
-    try {
-      return (passwordMatch = await bcrypt.compare(password, hash));
-    } catch (err) {
-      return { error: err };
-    }
-  }
-
   /**
    * @static
    * @async

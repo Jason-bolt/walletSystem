@@ -164,10 +164,13 @@ class UserService {
       if (!existingUser) {
         return { error: "Username or password is incorrect!" };
       } else {
-        const passwordMatch = await AuthMiddleware.passwordsMath(
+        console.log("passwordMatch");
+        const passwordMatch = await bcrypt.compare(
           password,
           existingUser.password
         );
+
+        console.log(passwordMatch);
 
         if (!passwordMatch) {
           return { error: "Username or password is incorrect!" };
@@ -209,15 +212,16 @@ class UserService {
       let tokenRecord = await Forgot_Password.findOne({ user_id: user._id });
 
       let token;
-      if (!tokenRecord.token) {
-        token = crypto.randomBytes(32).toString("hex");
-        await Forgot_Password.create({
-          user_id: user._id,
-          token,
-        });
-      } else {
-        token = tokenRecord.token;
+      if (tokenRecord) {
+        await Forgot_Password.deleteMany({ user_id: user._id });
       }
+
+      token = crypto.randomBytes(32).toString("hex");
+
+      await Forgot_Password.create({
+        user_id: user._id,
+        token,
+      });
 
       const link = `${process.env.BASE_URL}/${user._id}/${token}`;
 
@@ -233,6 +237,32 @@ class UserService {
       }
 
       return link;
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  static async resetPassword(data) {
+    try {
+      const { user_id, token, password, confirm_password } = data;
+
+      const hashed_password = await bcrypt.hash(password, 10);
+
+      const updated = await User.updateOne(
+        { _id: user_id },
+        { password: hashed_password }
+      );
+      if (updated.acknowledged) {
+        const deleted = await Forgot_Password.deleteMany({ user_id, token });
+
+        if (deleted.acknowledged) {
+          return true;
+        } else {
+          return { error: "Could not delete forgot password field!" };
+        }
+      } else {
+        return { error: "Could not update user!" };
+      }
     } catch (err) {
       return { error: err };
     }

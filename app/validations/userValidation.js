@@ -16,3 +16,10 @@ export const userLoginSchema = Joi.object({
 export const emailSchema = Joi.object({
   email: Joi.string().email().required(),
 });
+
+export const passwordResetSchema = Joi.object({
+  user_id: Joi.string().id().required(),
+  token: Joi.string().required(),
+  password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
+  confirm_password: Joi.ref("password"),
+});

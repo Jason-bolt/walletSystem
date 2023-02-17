@@ -185,7 +185,33 @@ class UserController {
 
       return Responses.success(res, {
         data: link,
-        message: "Reet link sent to email!",
+        message: "Reset link sent to email!",
+      });
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
+    }
+  }
+
+  static async resetPassword(req, res) {
+    try {
+      const data = req.resetData;
+      const password_updated = await UserService.resetPassword(data);
+
+      if (password_updated.error) {
+        return Responses.error(res, {
+          data: password_updated.error,
+          message: "Error resetting password!",
+          code: 400,
+        });
+      }
+
+      return Responses.success(res, {
+        data: null,
+        message: "Password has been reset!",
       });
     } catch (err) {
       return Responses.error(res, {

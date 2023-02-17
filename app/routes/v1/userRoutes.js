@@ -48,4 +48,9 @@ router.post("/reset-password", [
   UserController.sendPasswordResetLink,
 ]);
 
+router.post("/:user_id/:token", [
+  UserMiddleware.validResetPassword,
+  UserController.resetPassword,
+]);
+
 export default router;

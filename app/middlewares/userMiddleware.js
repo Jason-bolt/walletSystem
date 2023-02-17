@@ -4,8 +4,13 @@ import Schemas from "../db/schema";
 
 const { User, Forgot_Password } = Schemas;
 
-const { userSignUpSchema, userLoginSchema, emailSchema, passwordResetSchema } =
-  userValidations;
+const {
+  userSignUpSchema,
+  userLoginSchema,
+  emailSchema,
+  passwordResetSchema,
+  pinSchema,
+} = userValidations;
 
 /**
  * @class UserMiddleware
@@ -18,6 +23,7 @@ class UserMiddleware {
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
    * @param {Next} next - callback function that runs when middleware method ends
+   * @returns {Promise<Response|next>}
    */
   static async uniqueUser(req, res, next) {
     try {
@@ -49,6 +55,7 @@ class UserMiddleware {
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
    * @param {Next} next - callback function that runs when middleware method ends
+   * @returns {Promise<Response|next>}
    */
   static validateSignUpFields(req, res, next) {
     try {
@@ -81,6 +88,7 @@ class UserMiddleware {
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
    * @param {Next} next - callback function that runs when middleware method ends
+   * @returns {Promise<Response|next>}
    */
   static async validateLoginFields(req, res, next) {
     try {
@@ -113,6 +121,7 @@ class UserMiddleware {
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
    * @param {Next} next - callback function that runs when middleware method ends
+   * @returns {Promise<Response|next>}
    */
   static async userExists(req, res, next) {
     try {
@@ -157,6 +166,7 @@ class UserMiddleware {
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
    * @param {Next} next - callback function that runs when middleware method ends
+   * @returns {Promise<Response|next>}
    */
   static async validResetPassword(req, res, next) {
     try {
@@ -207,6 +217,39 @@ class UserMiddleware {
       }
 
       req.resetData = { user_id, token, password };
+      next();
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server error!",
+        code: 500,
+      });
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserMiddleware
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @param {Next} next - callback function that runs when middleware method ends
+   * @returns {Promise<Response|next>}
+   */
+  static async validPin(req, res, next) {
+    try {
+      const pin = req.body.pin;
+      const { error } = pinSchema.validate({pin}, { abortEarly: false });
+
+      if (error) {
+        return Responses.error(res, {
+          data: error.details,
+          message: "Pin is missing!",
+          code: 404,
+        });
+      }
+      req.pin = pin;
+      console.log("Here");
       next();
     } catch (err) {
       return Responses.error(res, {

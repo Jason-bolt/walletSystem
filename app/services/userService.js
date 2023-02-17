@@ -164,13 +164,10 @@ class UserService {
       if (!existingUser) {
         return { error: "Username or password is incorrect!" };
       } else {
-        console.log("passwordMatch");
         const passwordMatch = await bcrypt.compare(
           password,
           existingUser.password
         );
-
-        console.log(passwordMatch);
 
         if (!passwordMatch) {
           return { error: "Username or password is incorrect!" };
@@ -269,6 +266,33 @@ class UserService {
         }
       } else {
         return { error: "Could not update user!" };
+      }
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserService
+   * @param {Number} pin - User inputed pin code
+   * @param {ObjedtID} user_id - User ID, an instance of mongoose ObjiectID
+   * @returns {Promise<Object|Boolean>}
+   */
+  static async createPin(pin, user_id) {
+    try {
+      const hashed_pin = await bcrypt.hash(pin, 12);
+
+      const updated = await User.updateOne(
+        { _id: user_id },
+        { pin: hashed_pin }
+      );
+
+      if (updated.acknowledged) {
+        return true;
+      } else {
+        return { error: "Could not update user pin!" };
       }
     } catch (err) {
       return { error: err };

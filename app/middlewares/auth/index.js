@@ -14,7 +14,7 @@ class AuthMiddleware {
    * @param {Response} res - The response from the method
    * @param {Next} next - callback function that runs when middleware method ends
    */
-  static async checkJwtToken(req, res, next) {
+  static async auth(req, res, next) {
     try {
       const authorization = req.headers.authorization;
       if (!authorization) {
@@ -26,17 +26,21 @@ class AuthMiddleware {
       }
       const token = authorization.split(" ")[1];
 
+      let error = {};
       jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
         if (err) {
-          return Responses.error(res, {
-            data: err,
-            message: "Token is incorrect or expired!",
-            code: 400,
-          });
+          error = err;
         }
-        console.log(data);
         req.user = data;
       });
+
+      if (error.length == 0) {
+        return Responses.error(res, {
+          data: error,
+          message: "Token is incorrect or expired!",
+          code: 400,
+        });
+      }
       next();
     } catch (err) {
       return Responses.error(res, {

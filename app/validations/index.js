@@ -3,6 +3,7 @@ import {
   userLoginSchema,
   emailSchema,
   passwordResetSchema,
+  pinSchema,
 } from "./userValidation";
 
 const validations = {
@@ -10,6 +11,7 @@ const validations = {
   userLoginSchema,
   emailSchema,
   passwordResetSchema,
+  pinSchema,
 };
 
 export default validations;

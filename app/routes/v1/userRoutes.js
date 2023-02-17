@@ -59,4 +59,16 @@ router.post("/:user_id/:token", [
   UserController.resetPassword,
 ]);
 
+/**
+ *
+ * AUTH ROUTES
+ *
+ * User must be logged in to reach these routes
+ */
+router.post("/create-pin", [
+  AuthMiddleware.auth,
+  UserMiddleware.validPin,
+  UserController.createPin,
+]);
+
 export default router;

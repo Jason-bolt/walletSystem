@@ -24,7 +24,7 @@ const user = new Schema({
     required: true,
   },
   pin: {
-    type: Number,
+    type: String,
   },
   isVerified: {
     type: Boolean,

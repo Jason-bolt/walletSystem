@@ -23,3 +23,7 @@ export const passwordResetSchema = Joi.object({
   password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
   confirm_password: Joi.ref("password"),
 });
+
+export const pinSchema = Joi.object({
+  pin: Joi.string().length(4).required(),
+});

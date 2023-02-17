@@ -15,7 +15,7 @@ class UserController {
    * @memberof UserController
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
-   * @returns JSON
+   * @returns {Response} Response
    */
   static async createUser(req, res) {
     try {
@@ -46,7 +46,7 @@ class UserController {
    * @memberof UserController
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
-   * @returns JSON
+   * @returns {Response} Response
    */
   static async verifyOtp(req, res) {
     try {
@@ -89,7 +89,7 @@ class UserController {
    * @memberof UserController
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
-   * @returns JSON
+   * @returns {Response} Response
    */
   static async regenerateOtp(req, res) {
     try {
@@ -136,7 +136,7 @@ class UserController {
    * @memberof UserController
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
-   * @returns JSON
+   * @returns {Response} Response
    */
   static async login(req, res) {
     try {
@@ -168,7 +168,7 @@ class UserController {
    * @memberof UserController
    * @param {Request} req - The request from the endpoint
    * @param {Response} res - The response from the method
-   * @returns JSON
+   * @returns {Response} Response
    */
   static async sendPasswordResetLink(req, res) {
     try {
@@ -196,6 +196,14 @@ class UserController {
     }
   }
 
+  /**
+   * @static
+   * @async
+   * @memberof UserController
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns {Response} Response
+   */
   static async resetPassword(req, res) {
     try {
       const data = req.resetData;
@@ -212,6 +220,42 @@ class UserController {
       return Responses.success(res, {
         data: null,
         message: "Password has been reset!",
+      });
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserController
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns {Response} Response
+   */
+  static async createPin(req, res) {
+    try {
+      const user_id = req.user.id;
+      const pin = req.pin;
+
+      const pinCreated = await UserService.createPin(pin, user_id);
+
+      if (pinCreated.error) {
+        return Responses.error(res, {
+          data: pinCreated.error,
+          message: "Error creating pin!",
+          code: 400,
+        });
+      }
+
+      return Responses.success(res, {
+        data: null,
+        message: "Pin has been created!",
       });
     } catch (err) {
       return Responses.error(res, {

@@ -228,7 +228,7 @@ class UserService {
       const emailBody = {
         email: user.email,
         subject: "Reset Password Link",
-        text: `Reset password with this link: ${link}`,
+        text: `Reset password with this link: ${link} it will expire in 10 minutes.`,
       };
       const emailSent = await EmailHelper.sendMail(emailBody);
 
@@ -242,6 +242,13 @@ class UserService {
     }
   }
 
+  /**
+   * @static
+   * @async
+   * @memberof UserService
+   * @param {Object} data - Contains user_id, token, password
+   * @returns {Promise<Object|Boolean>} - Error or true
+   */
   static async resetPassword(data) {
     try {
       const { user_id, token, password, confirm_password } = data;

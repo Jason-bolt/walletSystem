@@ -150,6 +150,14 @@ class UserMiddleware {
     }
   }
 
+  /**
+   * @static
+   * @async
+   * @memberof UserMiddleware
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @param {Next} next - callback function that runs when middleware method ends
+   */
   static async validResetPassword(req, res, next) {
     try {
       const { user_id, token } = req.params;
@@ -198,7 +206,7 @@ class UserMiddleware {
         });
       }
 
-      req.resetData = data;
+      req.resetData = { user_id, token, password };
       next();
     } catch (err) {
       return Responses.error(res, {

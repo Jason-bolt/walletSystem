@@ -176,6 +176,7 @@ class UserService {
         const data = {
           id: existingUser._id,
           email: existingUser.email,
+          phone: existingUser.phone,
           firstName: existingUser.firstName,
           lastName: existingUser.lastName,
         };

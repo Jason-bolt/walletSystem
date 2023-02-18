@@ -7,7 +7,6 @@ const { AccountController } = Controllers;
 
 const router = new Router();
 
-
 /**
  *
  * AUTH ROUTES
@@ -22,8 +21,14 @@ router.post("/get-balance", [
   AccountController.getAccountBalance,
 ]);
 
-router.post("/transaction-history", [
+/**
+ * Retrieving all account information
+ */
+router.post("/get-account-data", [
   AuthMiddleware.auth,
-])
+  AccountController.getAccountData,
+]);
+
+router.post("/transaction-history", [AuthMiddleware.auth]);
 
 export default router;

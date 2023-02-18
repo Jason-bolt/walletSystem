@@ -9,7 +9,6 @@ const { AccountService } = Services;
  * @class AccountController
  */
 class AccountController {
-  
   /**
    * @static
    * @async
@@ -20,19 +19,53 @@ class AccountController {
    */
   static async getAccountBalance(req, res) {
     try {
-      const { id } = req.user;
-      const balances = await AccountService.getAccountBalance(id);
-      if (balances.error) {
+      const user = req.user;
+      const accountData = await AccountService.getAccountData(user);
+      if (!accountData) {
         return Responses.error(res, {
-          data: balances.error,
-          message: "Error getting account balance!",
+          data: null,
+          message: "Error getting account data!",
+          code: 400,
+        });
+      }
+      const { balance } = accountData.AccountData;
+
+      const DOLLAR_FACTOR = 0.0022;
+      const naira_balance = balance;
+      const dollar_balance = balance * DOLLAR_FACTOR;
+      const balances = {
+        naira_balance,
+        dollar_balance,
+      };
+
+      return Responses.success(res, {
+        data: balances,
+        message: "Balance retrieved!",
+      });
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
+    }
+  }
+
+  static async getAccountData(req, res) {
+    try {
+      const user = req.user;
+      const accountData = await AccountService.getAccountData(user);
+      if (accountData.error) {
+        return Responses.error(res, {
+          data: accountData.error,
+          message: "Error getting account data!",
           code: 400,
         });
       }
 
       return Responses.success(res, {
-        data: balances,
-        message: "Balanece retrieved!",
+        data: accountData,
+        message: "Account data retrieved!",
       });
     } catch (err) {
       return Responses.error(res, {

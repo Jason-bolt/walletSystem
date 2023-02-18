@@ -6,27 +6,31 @@ const { Account } = Schemas;
  * @class AccountService
  */
 class AccountService {
-  
-
   /**
    * @static
    * @async
    * @memberof AccountService
-   * @param {ObjectID} user_id - User ID an object of mongoose ObjectID
+   * @param {Object} user - User object in the token
    * @returns {Promise<Object>}
    */
-  static async getAccountBalance(user_id) {
+  static async getAccountData(user) {
     try {
-      const DOLLAR_FACTOR = 0.0022;
-      const account = await Account.findOne({ user: user_id });
+      const { id, email, phone, firstName, lastName } = user;
+      const account = await Account.findOne({ user: id });
       if (!account) {
         return { error: "Account could not be retrieved!" };
       }
-      let { balance } = account;
-      balance = parseInt(balance);
-      const naira_balance = balance;
-      const dollar_balance = balance * DOLLAR_FACTOR;
-      return { naira_balance, dollar_balance };
+
+      const { _id, accountNumber, balance } = account;
+
+      return {
+        AccountData: {
+          id: _id,
+          accountNumber,
+          balance,
+        },
+        user: user,
+      };
     } catch (err) {
       return { error: err };
     }

@@ -18,8 +18,8 @@ const funding = new Schema({
   },
   createdAt: {
     type: Date,
-    
-  }
+    default: Date.now(),
+  },
 });
 
 const Funding = mongoose.model("Funding", funding);

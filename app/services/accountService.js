@@ -137,6 +137,12 @@ class AccountService {
       );
 
       if (updated.acknowledged) {
+        // Add funding data to Funding table
+        await Funding.create({
+          currency,
+          amount,
+          user: user_id,
+        });
         return true;
       } else {
         return { error: "Could not update account!" };

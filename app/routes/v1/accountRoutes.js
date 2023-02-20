@@ -16,7 +16,7 @@ const router = new Router();
 /**
  * Retrieving account balance
  */
-router.post("/get-balance", [
+router.get("/get-balance", [
   AuthMiddleware.auth,
   AccountController.getAccountBalance,
 ]);
@@ -24,7 +24,7 @@ router.post("/get-balance", [
 /**
  * Retrieving all account information
  */
-router.post("/get-account-data", [
+router.get("/get-account-data", [
   AuthMiddleware.auth,
   AccountMiddleware.isAccountActivated,
   AccountController.getAccountData,
@@ -45,11 +45,10 @@ router.post("/fund-wallet", [
   AccountController.fundWallet,
 ]);
 
-
 /**
  * Retrieving transaction history
  */
-router.post("/get-transaction-history", [
+router.get("/get-transaction-history", [
   AuthMiddleware.auth,
   AccountMiddleware.isAccountActivated,
   AccountController.getTransactionHistory, // Get back to it later

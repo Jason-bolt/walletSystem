@@ -100,6 +100,14 @@ class AccountController {
       const transferHistory = await AccountService.getTransactionHistory(
         user_id
       );
+
+      if (transferHistory.error) {
+        return Responses.error(res, {
+          data: transferHistory.error,
+          message: "Error getting transaction history!",
+          code: 400,
+        });
+      }
       console.log(transferHistory);
       res.send(transferHistory);
     } catch (err) {
@@ -127,6 +135,54 @@ class AccountController {
         transferData,
         user_id
       );
+
+      if (transferMade.error) {
+        return Responses.error(res, {
+          data: transferMade.error,
+          message: "Error transferring funds!",
+          code: 400,
+        });
+      }
+
+      return Responses.success(res, {
+        data: null,
+        message: "Transfer made successfully!",
+      });
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof AccountController
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns {Response} Response
+   */
+  static async fundWallet(req, res) {
+    try {
+      const user_id = req.user.id;
+      const fundingData = req.fundingData;
+      const fundingMade = await AccountService.fundWallet(fundingData, user_id);
+
+      if (fundingMade.error) {
+        return Responses.error(res, {
+          data: fundingMade.error,
+          message: "Error Funding wallet!",
+          code: 400,
+        });
+      }
+
+      return Responses.success(res, {
+        data: null,
+        message: "Wallet funded successfully!",
+      });
     } catch (err) {
       return Responses.error(res, {
         data: err,

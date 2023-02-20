@@ -6,7 +6,7 @@ import {
   pinSchema,
 } from "./userValidation";
 
-import { transferSchema } from "./accountValidation";
+import { transferSchema, fundingSchema } from "./accountValidation";
 
 const UserValidation = {
   userSignUpSchema,
@@ -18,6 +18,7 @@ const UserValidation = {
 
 const AccountValidation = {
   transferSchema,
+  fundingSchema,
 };
 
 const validations = {

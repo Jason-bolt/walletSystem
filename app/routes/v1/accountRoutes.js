@@ -31,6 +31,22 @@ router.post("/get-account-data", [
 ]);
 
 /**
+ * Fund wallet
+ */
+// router.post("/fund-wallet", [
+//   AuthMiddleware.auth,
+//   AccountMiddleware.isAccountActivated,
+// ]);
+
+router.post("/fund-wallet", [
+  AuthMiddleware.auth,
+  AccountMiddleware.isAccountActivated,
+  AccountMiddleware.checkFundingFields,
+  AccountController.fundWallet,
+]);
+
+
+/**
  * Retrieving transaction history
  */
 router.post("/get-transaction-history", [
@@ -51,5 +67,9 @@ router.post("/make-transfer", [
   AccountMiddleware.checkPin,
   AccountController.makeTransfer, // Come back to this after making deposit
 ]);
+
+// router.post("/fff", (req, res) => {
+//   res.send
+// });
 
 export default router;

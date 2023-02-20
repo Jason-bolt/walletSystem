@@ -87,7 +87,8 @@ class AccountService {
 
       const newSenderBalance =
         parseInt(senderAccount.balance) - parseInt(currency_amount);
-      const newOtherBalance = parseInt(otherAccount.balance) + parseInt(currency_amount);
+      const newOtherBalance =
+        parseInt(otherAccount.balance) + parseInt(currency_amount);
 
       const SendUpdated = await Account.updateOne(
         { accountNumber: senderAccount.accountNumber },
@@ -102,6 +103,43 @@ class AccountService {
         return recUpdated.acknowledged;
       } else {
         return { error: "Could not update balance!" };
+      }
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof AccountService
+   * @param {Object} fundingData - Data from the client
+   * @param {ObjectID} user_id - User ID, instance of mongoose ObjectID
+   * @returns {Promise<Object|Boolean>}
+   */
+  static async fundWallet(fundingData, user_id) {
+    try {
+      let { currency, amount } = fundingData;
+      let currency_amount = 0;
+      if (currency === "naira") {
+        currency_amount = amount;
+      } else {
+        currency_amount = amount / DOLLAR_FACTOR;
+      }
+
+      const account = await Account.findOne({ user: user_id });
+
+      const new_balance = account.balance + parseInt(currency_amount);
+
+      const updated = await Account.updateOne(
+        { user: user_id },
+        { balance: new_balance }
+      );
+
+      if (updated.acknowledged) {
+        return true;
+      } else {
+        return { error: "Could not update account!" };
       }
     } catch (err) {
       return { error: err };

@@ -1,5 +1,8 @@
 import Services from "../services";
 import helpers from "../../config/helpers";
+import constants from "../../config/constants";
+
+const { DOLLAR_FACTOR } = constants;
 
 const { Responses } = helpers;
 
@@ -30,7 +33,6 @@ class AccountController {
       }
       const { balance } = accountData.AccountData;
 
-      const DOLLAR_FACTOR = 0.0022;
       const naira_balance = balance;
       const dollar_balance = balance * DOLLAR_FACTOR;
       const balances = {

@@ -240,11 +240,11 @@ class UserController {
    */
   static async createPin(req, res) {
     try {
-      const user_id = req.user.id;
+      const { id: user_id, email } = req.user;
       const pin = req.pin;
 
       console.log("Here");
-      const pinCreated = await UserService.createPin(pin, user_id);
+      const pinCreated = await UserService.createPin(pin, user_id, email);
 
       if (pinCreated.error) {
         return Responses.error(res, {
@@ -255,7 +255,7 @@ class UserController {
       }
 
       return Responses.success(res, {
-        data: null,
+        data: pin,
         message: "Pin created, account has been activated!",
       });
     } catch (err) {

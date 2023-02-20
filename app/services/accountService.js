@@ -1,4 +1,7 @@
 import Schemas from "../db/schema";
+import constants from "../../config/constants";
+
+const { DOLLAR_FACTOR } = constants;
 
 const { Account, Funding, Transfer } = Schemas;
 
@@ -15,7 +18,7 @@ class AccountService {
    */
   static async getAccountData(user) {
     try {
-      const { id, email, phone, firstName, lastName } = user;
+      const { id } = user;
       const account = await Account.findOne({ user: id });
       if (!account) {
         return { error: "Account could not be retrieved!" };
@@ -69,15 +72,22 @@ class AccountService {
    */
   static async makeTransfer(transferData, user_id) {
     try {
-      const { currency, recipientAccount, amount, pin } = transferData;
+      const { currency, recipientAccount, amount } = transferData;
       const senderAccount = await Account.findOne({ user: user_id });
-      const othertAccount = await Account.findOne({
+      const otherAccount = await Account.findOne({
         accountNumber: recipientAccount,
       });
 
+      let currency_amount = 0;
+      if (currency == "naira") {
+        currency_amount = amount;
+      } else {
+        currency_amount = amount / DOLLAR_FACTOR;
+      }
+
       const newSenderBalance =
-        parseInt(senderAccount.balance) - parseInt(amount);
-      const newOtherBalance = parseInt(otherAccount.balance) + parseInt(amount);
+        parseInt(senderAccount.balance) - parseInt(currency_amount);
+      const newOtherBalance = parseInt(otherAccount.balance) + parseInt(currency_amount);
 
       const SendUpdated = await Account.updateOne(
         { accountNumber: senderAccount.accountNumber },

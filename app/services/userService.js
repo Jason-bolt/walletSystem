@@ -309,7 +309,7 @@ class UserService {
    * @param {ObjedtID} user_id - User ID, an instance of mongoose ObjiectID
    * @returns {Promise<Object|Boolean>}
    */
-  static async createPin(pin, user_id) {
+  static async createPin(pin, user_id, email) {
     try {
       const hashed_pin = await bcrypt.hash(pin, 12);
 
@@ -328,6 +328,14 @@ class UserService {
         if (accountCreated.error) {
           return { error: accountCreated.error };
         } else {
+          const emailSent = await EmailHelper.sendMail({
+            email: email,
+            subject: "Account Activated",
+            text: `Congratulations! Your wallet has been activated, here is your account number ${accountCreated.accountNumber}.`,
+          });
+          if (emailSent.error) {
+            return { error: emailSent.error };
+          }
           return true;
         }
       } else {

@@ -1,8 +1,9 @@
-import userValidations from "../validations";
+import validations from "../validations";
 import Responses from "../../config/helpers/responses";
 import Schemas from "../db/schema";
 
 const { User, Forgot_Password } = Schemas;
+const { UserValidation } = validations;
 
 const {
   userSignUpSchema,
@@ -10,7 +11,7 @@ const {
   emailSchema,
   passwordResetSchema,
   pinSchema,
-} = userValidations;
+} = UserValidation;
 
 /**
  * @class UserMiddleware

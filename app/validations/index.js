@@ -6,12 +6,23 @@ import {
   pinSchema,
 } from "./userValidation";
 
-const validations = {
+import { transferSchema } from "./accountValidation";
+
+const UserValidation = {
   userSignUpSchema,
   userLoginSchema,
   emailSchema,
   passwordResetSchema,
   pinSchema,
+};
+
+const AccountValidation = {
+  transferSchema,
+};
+
+const validations = {
+  UserValidation,
+  AccountValidation,
 };
 
 export default validations;

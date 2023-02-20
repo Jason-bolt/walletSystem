@@ -2,7 +2,7 @@ import { Router } from "express";
 import Controllers from "../../controllers";
 import middlewares from "../../middlewares";
 
-const { AuthMiddleware } = middlewares;
+const { AccountMiddleware, AuthMiddleware } = middlewares;
 const { AccountController } = Controllers;
 
 const router = new Router();
@@ -29,6 +29,24 @@ router.post("/get-account-data", [
   AccountController.getAccountData,
 ]);
 
-router.post("/transaction-history", [AuthMiddleware.auth]);
+/**
+ * Retrieving transaction history
+ */
+router.post("/get-transaction-history", [
+  AuthMiddleware.auth,
+  AccountController.getTransactionHistory, // Get back to it later
+]);
+
+/**
+ * Make transaction
+ */
+router.post("/make-transfer", [
+  AuthMiddleware.auth,
+  AccountMiddleware.checkTransferFields,
+  AccountMiddleware.checkRecipientExists,
+  AccountMiddleware.checkBalanceIsEnough,
+  AccountMiddleware.checkPin,
+  AccountController.makeTransfer, // Come back to this after making deposit
+]);
 
 export default router;

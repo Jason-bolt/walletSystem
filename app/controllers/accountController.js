@@ -51,6 +51,14 @@ class AccountController {
     }
   }
 
+  /**
+   * @static
+   * @async
+   * @memberof AccountController
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns {Response} Response
+   */
   static async getAccountData(req, res) {
     try {
       const user = req.user;
@@ -67,6 +75,56 @@ class AccountController {
         data: accountData,
         message: "Account data retrieved!",
       });
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof AccountController
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns {Response} Response
+   */
+  static async getTransactionHistory(req, res) {
+    try {
+      const user_id = req.user.id;
+      const transferHistory = await AccountService.getTransactionHistory(
+        user_id
+      );
+      console.log(transferHistory);
+      res.send(transferHistory);
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server Error!",
+        code: 500,
+      });
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof AccountController
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @returns {Response} Response
+   */
+  static async makeTransfer(req, res) {
+    try {
+      const user_id = req.user.id;
+      const transferData = req.transferData;
+      const transferMade = await AccountService.makeTransfer(
+        transferData,
+        user_id
+      );
     } catch (err) {
       return Responses.error(res, {
         data: err,

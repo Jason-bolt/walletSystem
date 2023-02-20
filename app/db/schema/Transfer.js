@@ -16,7 +16,7 @@ const transfer = new Schema({
     type: Number,
     ref: Account,
   },
-  RecepientAccount: {
+  RecipientAccount: {
     type: Number,
     ref: Account,
   },

@@ -26,6 +26,7 @@ router.post("/get-balance", [
  */
 router.post("/get-account-data", [
   AuthMiddleware.auth,
+  AccountMiddleware.isAccountActivated,
   AccountController.getAccountData,
 ]);
 
@@ -34,6 +35,7 @@ router.post("/get-account-data", [
  */
 router.post("/get-transaction-history", [
   AuthMiddleware.auth,
+  AccountMiddleware.isAccountActivated,
   AccountController.getTransactionHistory, // Get back to it later
 ]);
 
@@ -42,6 +44,7 @@ router.post("/get-transaction-history", [
  */
 router.post("/make-transfer", [
   AuthMiddleware.auth,
+  AccountMiddleware.isAccountActivated,
   AccountMiddleware.checkTransferFields,
   AccountMiddleware.checkRecipientExists,
   AccountMiddleware.checkBalanceIsEnough,

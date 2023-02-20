@@ -185,6 +185,38 @@ class AccountMiddleware {
       });
     }
   }
+
+  /**
+   * @static
+   * @async
+   * @memberof AccountMiddleware
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @param {Next} next - callback function that runs when middleware method ends
+   * @returns {Promise<Response|next>}
+   */
+  static async isAccountActivated(req, res, next) {
+    try {
+      const user_id = req.user.id;
+      const account = await Account.findOne({ user: user_id });
+
+      if (!account) {
+        return Responses.error(res, {
+          data: null,
+          message: "Account not activated, please create a pin!",
+          code: 400,
+        });
+      }
+
+      next();
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: "Server error!",
+        code: 500,
+      });
+    }
+  }
 }
 
 export default AccountMiddleware;

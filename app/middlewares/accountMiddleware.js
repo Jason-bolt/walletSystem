@@ -2,7 +2,9 @@ import validations from "../validations";
 import Responses from "../../config/helpers/responses";
 import Schemas from "../db/schema";
 import bcrypt from "bcrypt";
+import constants from "../../config/constants";
 
+const { DOLLAR_FACTOR } = constants;
 const { Account, User } = Schemas;
 const { AccountValidation } = validations;
 
@@ -103,6 +105,7 @@ class AccountMiddleware {
       const recipientAccount = await Account.findOne({
         accountNumber: recipientNumber,
       });
+
       if (!recipientAccount) {
         return Responses.error(res, {
           data: null,
@@ -170,9 +173,25 @@ class AccountMiddleware {
   static async checkBalanceIsEnough(req, res, next) {
     try {
       const user_id = req.user.id;
+      const { currency, amount } = req.transferData;
+
+      let currency_amount = 0;
+
+      if (currency === "naira") {
+        currency_amount = amount;
+      } else if (currency === "dollar") {
+        currency_amount = amount / DOLLAR_FACTOR;
+      } else {
+        return Responses.error(res, {
+          data: null,
+          message: "Currency must either be 'naira' or 'dollar'!",
+          code: 400,
+        });
+      }
+
       const account = await Account.findOne({ user: user_id });
-      const newBalance =
-        parseInt(account.balance) - parseInt(req.transferData.amount);
+      const newBalance = parseInt(account.balance) - currency_amount;
+
       if (newBalance < 0) {
         return Responses.error(res, {
           data: null,
@@ -202,8 +221,9 @@ class AccountMiddleware {
   static async checkPin(req, res, next) {
     try {
       const user_id = req.user.id;
-      const existingPin = await User.findOne({ _id: user_id }, pin);
-      const inputedPin = req.transfer.pin;
+      const currentUser = await User.findOne({ _id: user_id });
+      const existingPin = currentUser.pin;
+      const inputedPin = req.transferData.pin;
 
       const pinMatch = await bcrypt.compare(inputedPin, existingPin);
 

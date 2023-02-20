@@ -16,9 +16,13 @@ const transfer = new Schema({
     type: Number,
     ref: Account,
   },
-  RecipientAccount: {
+  recipientAccount: {
     type: Number,
     ref: Account,
+  },
+  type: {
+    type: String,
+    default: "transfer",
   },
   createdAt: {
     type: Date,

@@ -38,20 +38,14 @@ router.get("/get-account-data", [
 //   AccountMiddleware.isAccountActivated,
 // ]);
 
+/**
+ * Fund wallet
+ */
 router.post("/fund-wallet", [
   AuthMiddleware.auth,
   AccountMiddleware.isAccountActivated,
   AccountMiddleware.checkFundingFields,
   AccountController.fundWallet,
-]);
-
-/**
- * Retrieving transaction history
- */
-router.get("/get-transaction-history", [
-  AuthMiddleware.auth,
-  AccountMiddleware.isAccountActivated,
-  AccountController.getTransactionHistory, // Get back to it later
 ]);
 
 /**
@@ -65,6 +59,15 @@ router.post("/make-transfer", [
   AccountMiddleware.checkBalanceIsEnough,
   AccountMiddleware.checkPin,
   AccountController.makeTransfer, // Come back to this after making deposit
+]);
+
+/**
+ * Retrieving transaction history
+ */
+router.get("/get-transaction-history", [
+  AuthMiddleware.auth,
+  AccountMiddleware.isAccountActivated,
+  AccountController.getTransactionHistory, // Get back to it later
 ]);
 
 // router.post("/fff", (req, res) => {

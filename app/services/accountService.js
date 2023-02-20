@@ -56,7 +56,7 @@ class AccountService {
         senderAccount: accountData.accountNumber,
       });
 
-      return { ...fundingData, ...transferData };
+      return [...fundingData, ...transferData];
     } catch (err) {
       return { error: err };
     }
@@ -72,23 +72,25 @@ class AccountService {
    */
   static async makeTransfer(transferData, user_id) {
     try {
-      const { currency, recipientAccount, amount } = transferData;
+      const { currency, recipientNumber, amount } = transferData;
       const senderAccount = await Account.findOne({ user: user_id });
-      const otherAccount = await Account.findOne({
-        accountNumber: recipientAccount,
+      const recipientAccount = await Account.findOne({
+        accountNumber: recipientNumber,
       });
 
       let currency_amount = 0;
       if (currency == "naira") {
         currency_amount = amount;
-      } else {
+      } else if (currency === "dollar") {
         currency_amount = amount / DOLLAR_FACTOR;
+      } else {
+        return { error: "Currency must either be 'naira' or 'dollar'!" };
       }
 
       const newSenderBalance =
         parseInt(senderAccount.balance) - parseInt(currency_amount);
       const newOtherBalance =
-        parseInt(otherAccount.balance) + parseInt(currency_amount);
+        parseInt(recipientAccount.balance) + parseInt(currency_amount);
 
       const SendUpdated = await Account.updateOne(
         { accountNumber: senderAccount.accountNumber },
@@ -97,10 +99,20 @@ class AccountService {
 
       if (SendUpdated.acknowledged) {
         const recUpdated = await Account.updateOne(
-          { accountNumber: otherAccount.accountNumber },
+          { accountNumber: recipientAccount.accountNumber },
           { balance: newOtherBalance }
         );
-        return recUpdated.acknowledged;
+        if (recUpdated.acknowledged) {
+          const t = await Transfer.create({
+            currency,
+            amount,
+            senderAccount: senderAccount.accountNumber,
+            recipientAccount: recipientNumber,
+          });
+          return true;
+        } else {
+          return { error: "Could not update transfer table!" };
+        }
       } else {
         return { error: "Could not update balance!" };
       }
@@ -123,8 +135,10 @@ class AccountService {
       let currency_amount = 0;
       if (currency === "naira") {
         currency_amount = amount;
-      } else {
+      } else if (currency === "dollar") {
         currency_amount = amount / DOLLAR_FACTOR;
+      } else {
+        return { error: "Currency must either be 'naira' or 'dollar'!" };
       }
 
       const account = await Account.findOne({ user: user_id });

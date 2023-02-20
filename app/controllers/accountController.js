@@ -108,8 +108,14 @@ class AccountController {
           code: 400,
         });
       }
-      console.log(transferHistory);
-      res.send(transferHistory);
+
+      // Sorting transactions
+      transferHistory.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+      return Responses.success(res, {
+        data: transferHistory,
+        message: "Serving transaction history!",
+      });
     } catch (err) {
       return Responses.error(res, {
         data: err,

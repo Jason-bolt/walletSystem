@@ -3,7 +3,7 @@ import constants from "../../config/constants";
 
 const { DOLLAR_FACTOR } = constants;
 
-const { Account, Funding, Transfer } = Schemas;
+const { Account, Funding, Transfer, Transaction } = Schemas;
 
 /**
  * @class AccountService

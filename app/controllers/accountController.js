@@ -99,6 +99,15 @@ class AccountController {
       let { page, type, start, end } = req.body;
       const limit = 10;
       const user_id = req.user.id;
+
+      if (start > end) {
+        return Responses.error(res, {
+          data: null,
+          message: "Start date cannot be later than end date!",
+          code: 400,
+        });
+      }
+      
       const transferHistory = await AccountService.getTransactionHistory(
         user_id,
         page,

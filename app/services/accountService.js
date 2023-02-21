@@ -62,21 +62,23 @@ class AccountService {
         user: user_id,
       }).populate("user");
 
-      const transactionHistory = await Transaction.find({
+      let query = {
         senderAccount: accountData.accountNumber,
         type,
-        // createdAt: {$gte: start, $lte: }
-      })
+      };
+
+      if (start_date && end_date) {
+        query.createdAt = { $gte: start_date, $lte: end_date };
+      }
+
+      const transactionHistory = await Transaction.find(query)
         .limit(limit)
         .skip(page * limit);
 
       const next_page = await AccountService.checkNextPage(
-        accountData.accountNumber,
         page,
-        type,
         limit,
-        start_date,
-        end_date
+        query
       );
 
       return { transactionHistory, next_page };
@@ -86,22 +88,16 @@ class AccountService {
   }
 
   static async checkNextPage(
-    sender_account,
     current_page,
-    transaction_type,
     limit,
-    start_date,
-    end_date
+    query
   ) {
     try {
-      const type = transaction_type || ["transfer", "funding"];
-
       let page = current_page + 1;
-      const total_count = await Transaction.find({
-        senderAccount: sender_account,
-        type,
-        // createdAt: {$gte: start, $lte: }
-      }).countDocuments();
+
+      const total_count = await Transaction.find(query).countDocuments();
+      console.log("total_count")
+
 
       const next_pages = Math.ceil((total_count - page * limit) / limit);
 

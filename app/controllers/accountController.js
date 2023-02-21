@@ -96,29 +96,25 @@ class AccountController {
    */
   static async getTransactionHistory(req, res) {
     try {
-      const default_page = 0;
-      let { page } = req.body;
-      let current_page = page || default_page;
+      let { page, type, start, end } = req.body;
       const limit = 10;
       const user_id = req.user.id;
       const transferHistory = await AccountService.getTransactionHistory(
         user_id,
-        current_page,
-        limit
+        page,
+        type,
+        limit,
+        start,
+        end
       );
 
-      if (transferHistory.error) {
-        return Responses.error(res, {
-          data: transferHistory.error,
-          message: "Error getting transaction history!",
-          code: 400,
-        });
-      }
-
-      // Sorting transactions
-      transferHistory.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-      );
+      // if (transferHistory.error) {
+      //   return Responses.error(res, {
+      //     data: transferHistory.error,
+      //     message: "Error getting transaction history!",
+      //     code: 400,
+      //   });
+      // }
 
       return Responses.success(res, {
         data: transferHistory,

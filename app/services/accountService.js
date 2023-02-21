@@ -46,23 +46,70 @@ class AccountService {
    * @param {ObjectID} user_id - User id, instance of mongoose ObjectID
    * @returns {Promise<Object>}
    */
-  static async getTransactionHistory(user_id, page, limit) {
+  static async getTransactionHistory(
+    user_id,
+    current_page,
+    transaction_type,
+    limit,
+    start_date,
+    end_date
+  ) {
     try {
-      const accountData = await Account.findOne({ user: user_id }).populate(
-        "user"
-      );
+      const page = current_page || 0;
+      const type = transaction_type || ["transfer", "funding"];
+
+      const accountData = await Account.findOne({
+        user: user_id,
+      }).populate("user");
+
       const transactionHistory = await Transaction.find({
         senderAccount: accountData.accountNumber,
+        type,
+        // createdAt: {$gte: start, $lte: }
       })
         .limit(limit)
         .skip(page * limit);
-      // const fundingData = await Funding.find({ user: user_id });
-      // const transferData = await Transfer.find({
-      //   senderAccount: accountData.accountNumber,
-      // });
 
-      // return [...fundingData, ...transferData];
-      return transactionHistory;
+      const next_page = await AccountService.checkNextPage(
+        accountData.accountNumber,
+        page,
+        type,
+        limit,
+        start_date,
+        end_date
+      );
+
+      return { transactionHistory, next_page };
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  static async checkNextPage(
+    sender_account,
+    current_page,
+    transaction_type,
+    limit,
+    start_date,
+    end_date
+  ) {
+    try {
+      const type = transaction_type || ["transfer", "funding"];
+
+      let page = current_page + 1;
+      const total_count = await Transaction.find({
+        senderAccount: sender_account,
+        type,
+        // createdAt: {$gte: start, $lte: }
+      }).countDocuments();
+
+      const next_pages = Math.ceil((total_count - page * limit) / limit);
+
+      if (next_pages < 0) {
+        return null;
+      } else {
+        return next_pages;
+      }
     } catch (err) {
       return { error: err };
     }

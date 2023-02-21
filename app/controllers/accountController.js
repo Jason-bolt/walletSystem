@@ -99,6 +99,7 @@ class AccountController {
       let { page, type, start, end } = req.body;
       const limit = 10;
       const user_id = req.user.id;
+      const filters = { transaction_type: type, start_date: start, end_date: end };
 
       if (start > end) {
         return Responses.error(res, {
@@ -107,14 +108,12 @@ class AccountController {
           code: 400,
         });
       }
-      
+
       const transferHistory = await AccountService.getTransactionHistory(
         user_id,
         page,
-        type,
         limit,
-        start,
-        end
+        filters
       );
 
       // if (transferHistory.error) {

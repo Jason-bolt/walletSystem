@@ -46,15 +46,10 @@ class AccountService {
    * @param {ObjectID} user_id - User id, instance of mongoose ObjectID
    * @returns {Promise<Object>}
    */
-  static async getTransactionHistory(
-    user_id,
-    current_page,
-    transaction_type,
-    limit,
-    start_date,
-    end_date
-  ) {
+  static async getTransactionHistory(user_id, current_page, limit, filters) {
     try {
+      const { transaction_type, start_date, end_date } = filters;
+
       const page = current_page || 0;
       const type = transaction_type || ["transfer", "funding"];
 
@@ -75,11 +70,7 @@ class AccountService {
         .limit(limit)
         .skip(page * limit);
 
-      const next_page = await AccountService.checkNextPage(
-        page,
-        limit,
-        query
-      );
+      const next_page = await AccountService.checkNextPage(page, limit, query);
 
       return { transactionHistory, next_page };
     } catch (err) {
@@ -87,17 +78,21 @@ class AccountService {
     }
   }
 
-  static async checkNextPage(
-    current_page,
-    limit,
-    query
-  ) {
+  /**
+   * @static
+   * @async
+   * @memberof AccountService
+   * @param {Number} current_page - Number from the client side, page 1 is 0
+   * @param {Number} limit - The number of views to show
+   * @param {Object} query - The query object to determine the next page
+   * @returns {Promise<Object|Number>}
+   */
+  static async checkNextPage(current_page, limit, query) {
     try {
       let page = current_page + 1;
 
       const total_count = await Transaction.find(query).countDocuments();
-      console.log("total_count")
-
+      console.log("total_count");
 
       const next_pages = Math.ceil((total_count - page * limit) / limit);
 

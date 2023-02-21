@@ -71,5 +71,4 @@ router.post("/create-pin", [
   UserController.createPin,
 ]);
 
-
 export default router;

@@ -5,8 +5,6 @@ import jwt from "jsonwebtoken";
 import middlewares from "../middlewares";
 import crypto from "crypto";
 
-const { AuthMiddleware } = middlewares;
-
 const { EmailHelper, OtpHelper } = helpers;
 
 const { User, Otp, Forgot_Password, Account } = Schemas;
@@ -180,17 +178,17 @@ class UserService {
           firstName: existingUser.firstName,
           lastName: existingUser.lastName,
         };
-        console.log(passwordMatch);
+
         const jwt_access_token = jwt.sign(data, process.env.JWT_SECRET, {
           expiresIn: process.env.JWT_TOKEN_EXPIRY,
         });
-        const jwt_refresh_token = jwt.sign(data, process.env.JWT_SECRET, {
-          expiresIn: process.env.JWT_TOKEN_EXPIRY,
-        });
+        // const jwt_refresh_token = jwt.sign(data, process.env.JWT_SECRET, {
+        //   expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRY,
+        // });
 
         return {
           access_token: jwt_access_token,
-          refresh_token: jwt_refresh_token,
+          // refresh_token: jwt_refresh_token,
         };
       }
     } catch (err) {

@@ -51,12 +51,14 @@ class AccountService {
       const accountData = await Account.findOne({ user: user_id }).populate(
         "user"
       );
-      const fundingData = await Funding.find({ user: user_id });
-      const transferData = await Transfer.find({
-        senderAccount: accountData.accountNumber,
-      });
+      const transactionHistory = await Transaction.find({senderAccount: accountData.accountNumber})
+      // const fundingData = await Funding.find({ user: user_id });
+      // const transferData = await Transfer.find({
+      //   senderAccount: accountData.accountNumber,
+      // });
 
-      return [...fundingData, ...transferData];
+      // return [...fundingData, ...transferData];
+      return transactionHistory;
     } catch (err) {
       return { error: err };
     }
@@ -103,11 +105,18 @@ class AccountService {
           { balance: newOtherBalance }
         );
         if (recUpdated.acknowledged) {
-          const t = await Transfer.create({
+          // await Transfer.create({
+          //   currency,
+          //   amount,
+          //   senderAccount: senderAccount.accountNumber,
+          //   recipientAccount: recipientNumber,
+          // });
+          await Transaction.create({
             currency,
             amount,
             senderAccount: senderAccount.accountNumber,
             recipientAccount: recipientNumber,
+            type: "transfer"
           });
           return true;
         } else {
@@ -152,10 +161,17 @@ class AccountService {
 
       if (updated.acknowledged) {
         // Add funding data to Funding table
-        await Funding.create({
+        // await Funding.create({
+        //   currency,
+        //   amount,
+        //   user: user_id,
+        // });
+        await Transaction.create({
           currency,
           amount,
-          user: user_id,
+          senderAccount: account.accountNumber,
+          recipientAccount: account.accountNumber,
+          type: "funding"
         });
         return true;
       } else {

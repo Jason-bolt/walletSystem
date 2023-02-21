@@ -46,12 +46,16 @@ class AccountService {
    * @param {ObjectID} user_id - User id, instance of mongoose ObjectID
    * @returns {Promise<Object>}
    */
-  static async getTransactionHistory(user_id) {
+  static async getTransactionHistory(user_id, page, limit) {
     try {
       const accountData = await Account.findOne({ user: user_id }).populate(
         "user"
       );
-      const transactionHistory = await Transaction.find({senderAccount: accountData.accountNumber})
+      const transactionHistory = await Transaction.find({
+        senderAccount: accountData.accountNumber,
+      })
+        .limit(limit)
+        .skip(page * limit);
       // const fundingData = await Funding.find({ user: user_id });
       // const transferData = await Transfer.find({
       //   senderAccount: accountData.accountNumber,
@@ -116,7 +120,7 @@ class AccountService {
             amount,
             senderAccount: senderAccount.accountNumber,
             recipientAccount: recipientNumber,
-            type: "transfer"
+            type: "transfer",
           });
           return true;
         } else {
@@ -171,7 +175,7 @@ class AccountService {
           amount,
           senderAccount: account.accountNumber,
           recipientAccount: account.accountNumber,
-          type: "funding"
+          type: "funding",
         });
         return true;
       } else {

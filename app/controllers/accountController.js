@@ -96,9 +96,15 @@ class AccountController {
    */
   static async getTransactionHistory(req, res) {
     try {
+      const default_page = 0;
+      let { page } = req.body;
+      let current_page = page || default_page;
+      const limit = 10;
       const user_id = req.user.id;
       const transferHistory = await AccountService.getTransactionHistory(
-        user_id
+        user_id,
+        current_page,
+        limit
       );
 
       if (transferHistory.error) {
@@ -110,7 +116,9 @@ class AccountController {
       }
 
       // Sorting transactions
-      transferHistory.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      transferHistory.sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+      );
 
       return Responses.success(res, {
         data: transferHistory,

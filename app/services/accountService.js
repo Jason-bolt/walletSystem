@@ -50,7 +50,7 @@ class AccountService {
     try {
       const { transaction_type, start_date, end_date } = filters;
 
-      const page = current_page || 0;
+      const page = (current_page || 1) - 1;
       const type = transaction_type || ["transfer", "funding"];
 
       const accountData = await Account.findOne({

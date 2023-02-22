@@ -54,7 +54,7 @@ router.post("/reset-password", [
  * @param {String} user_id - User ID
  * @param {String} token - Token to ensure uniqueness and validity of request
  */
-router.post("/:user_id/:token", [
+router.patch("/:user_id/:token", [
   UserMiddleware.validResetPassword,
   UserController.resetPassword,
 ]);

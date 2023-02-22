@@ -116,14 +116,6 @@ class AccountController {
         filters
       );
 
-      // if (transferHistory.error) {
-      //   return Responses.error(res, {
-      //     data: transferHistory.error,
-      //     message: "Error getting transaction history!",
-      //     code: 400,
-      //   });
-      // }
-
       return Responses.success(res, {
         data: transferHistory,
         message: "Serving transaction history!",

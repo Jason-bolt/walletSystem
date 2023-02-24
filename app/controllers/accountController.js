@@ -1,6 +1,6 @@
-import Services from "../services";
-import helpers from "../../config/helpers";
-import constants from "../../config/constants";
+import Services from '../services';
+import helpers from '../../config/helpers';
+import constants from '../../config/constants';
 
 const { DOLLAR_FACTOR } = constants;
 
@@ -22,13 +22,13 @@ class AccountController {
    */
   static async getAccountBalance(req, res) {
     try {
-      const user = req.user;
+      const { user } = req;
       const accountData = await AccountService.getAccountData(user);
       if (!accountData) {
         return Responses.error(res, {
           data: null,
-          message: "Error getting account data!",
-          code: 400,
+          message: 'Error getting account data!',
+          code: 400
         });
       }
       const { balance } = accountData.AccountData;
@@ -37,18 +37,18 @@ class AccountController {
       const dollar_balance = balance * DOLLAR_FACTOR;
       const balances = {
         naira_balance,
-        dollar_balance,
+        dollar_balance
       };
 
       return Responses.success(res, {
         data: balances,
-        message: "Balance retrieved!",
+        message: 'Balance retrieved!'
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
-        code: 500,
+        message: 'Server Error!',
+        code: 500
       });
     }
   }
@@ -63,25 +63,25 @@ class AccountController {
    */
   static async getAccountData(req, res) {
     try {
-      const user = req.user;
+      const { user } = req;
       const accountData = await AccountService.getAccountData(user);
       if (accountData.error) {
         return Responses.error(res, {
           data: accountData.error,
-          message: "Error getting account data!",
-          code: 400,
+          message: 'Error getting account data!',
+          code: 400
         });
       }
 
       return Responses.success(res, {
         data: accountData,
-        message: "Account data retrieved!",
+        message: 'Account data retrieved!'
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
-        code: 500,
+        message: 'Server Error!',
+        code: 500
       });
     }
   }
@@ -96,7 +96,7 @@ class AccountController {
    */
   static async getTransactionHistory(req, res) {
     try {
-      let { page, type, start, end } = req.body;
+      const { page, type, start, end } = req.body;
       const limit = 10;
       const user_id = req.user.id;
       const filters = { transaction_type: type, start_date: start, end_date: end };
@@ -104,8 +104,8 @@ class AccountController {
       if (start > end) {
         return Responses.error(res, {
           data: null,
-          message: "Start date cannot be later than end date!",
-          code: 400,
+          message: 'Start date cannot be later than end date!',
+          code: 400
         });
       }
 
@@ -118,13 +118,13 @@ class AccountController {
 
       return Responses.success(res, {
         data: transferHistory,
-        message: "Serving transaction history!",
+        message: 'Serving transaction history!'
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
-        code: 500,
+        message: 'Server Error!',
+        code: 500
       });
     }
   }
@@ -140,29 +140,26 @@ class AccountController {
   static async makeTransfer(req, res) {
     try {
       const user_id = req.user.id;
-      const transferData = req.transferData;
-      const transferMade = await AccountService.makeTransfer(
-        transferData,
-        user_id
-      );
+      const { transferData } = req;
+      const transferMade = await AccountService.makeTransfer(transferData, user_id);
 
       if (transferMade.error) {
         return Responses.error(res, {
           data: transferMade.error,
-          message: "Error transferring funds!",
-          code: 400,
+          message: 'Error transferring funds!',
+          code: 400
         });
       }
 
       return Responses.success(res, {
         data: null,
-        message: "Transfer made successfully!",
+        message: 'Transfer made successfully!'
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
-        code: 500,
+        message: 'Server Error!',
+        code: 500
       });
     }
   }
@@ -178,26 +175,26 @@ class AccountController {
   static async fundWallet(req, res) {
     try {
       const user_id = req.user.id;
-      const fundingData = req.fundingData;
+      const { fundingData } = req;
       const fundingMade = await AccountService.fundWallet(fundingData, user_id);
 
       if (fundingMade.error) {
         return Responses.error(res, {
           data: fundingMade.error,
-          message: "Error Funding wallet!",
-          code: 400,
+          message: 'Error Funding wallet!',
+          code: 400
         });
       }
 
       return Responses.success(res, {
         data: null,
-        message: "Wallet funded successfully!",
+        message: 'Wallet funded successfully!'
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
-        code: 500,
+        message: 'Server Error!',
+        code: 500
       });
     }
   }

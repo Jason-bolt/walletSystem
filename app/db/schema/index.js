@@ -1,8 +1,8 @@
-import User from "./User";
-import Otp from "./Otp";
-import Forgot_Password from "./ForgotPassword";
-import Account from "./Account";
-import Transaction from "./Transaction";
+import User from './User';
+import Otp from './Otp';
+import Forgot_Password from './ForgotPassword';
+import Account from './Account';
+import Transaction from './Transaction';
 
 const Schemas = {
   User,

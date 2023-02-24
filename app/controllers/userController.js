@@ -1,5 +1,5 @@
-import Services from "../services";
-import helpers from "../../config/helpers";
+import Services from '../services';
+import helpers from '../../config/helpers';
 
 const { Responses } = helpers;
 
@@ -25,18 +25,18 @@ class UserController {
       if (newUser.error) {
         Responses.error(res, {
           data: newUser.error,
-          message: "Error creating user!",
+          message: 'Error creating user!',
           code: 400,
         });
       } else {
         Responses.success(res, {
           data: newUser,
           message:
-            "Account created successfully, check your email for next steps.",
+            'Account created successfully, check your email for next steps.',
         });
       }
     } catch (err) {
-      Responses.error(res, { data: err, message: "Server Error!", code: 500 });
+      Responses.error(res, { data: err, message: 'Server Error!', code: 500 });
     }
   }
 
@@ -54,14 +54,14 @@ class UserController {
       if (!token) {
         Responses.error(res, {
           data: null,
-          message: "Token is missing!",
+          message: 'Token is missing!',
           code: 404,
         });
       }
       if (!user_id) {
         Responses.error(res, {
           data: null,
-          message: "User ID is missing!",
+          message: 'User ID is missing!',
           code: 404,
         });
       }
@@ -69,17 +69,17 @@ class UserController {
       if (tokenVerified.error) {
         Responses.error(res, {
           data: tokenVerified.error,
-          message: "Error verifying token!",
+          message: 'Error verifying token!',
           code: 400,
         });
       } else {
         Responses.success(res, {
           data: null,
-          message: "Account verified successfully!",
+          message: 'Account verified successfully!',
         });
       }
     } catch (err) {
-      Responses.error(res, { data: err, message: "Server Error!", code: 500 });
+      Responses.error(res, { data: err, message: 'Server Error!', code: 500 });
     }
   }
 
@@ -97,14 +97,14 @@ class UserController {
       if (!user_id) {
         return Responses.error(res, {
           data: null,
-          message: "User ID is missing!",
+          message: 'User ID is missing!',
           code: 404,
         });
       }
       if (!email) {
         return Responses.error(res, {
           data: null,
-          message: "Email is missing!",
+          message: 'Email is missing!',
           code: 404,
         });
       }
@@ -113,18 +113,18 @@ class UserController {
       if (newToken.error) {
         return Responses.error(res, {
           data: newToken.error,
-          message: "Error sending new token!",
+          message: 'Error sending new token!',
           code: 404,
         });
       }
       return Responses.success(res, {
         data: null,
-        message: "New token sent to email!",
+        message: 'New token sent to email!',
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
+        message: 'Server Error!',
         code: 500,
       });
     }
@@ -144,19 +144,19 @@ class UserController {
       if (tokens.error) {
         return Responses.error(res, {
           data: tokens.error,
-          message: "Error generating tokens!",
+          message: 'Error generating tokens!',
           code: 400,
         });
       }
 
       return Responses.success(res, {
         data: tokens,
-        message: "User logged in successfully!",
+        message: 'User logged in successfully!',
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
+        message: 'Server Error!',
         code: 500,
       });
     }
@@ -172,25 +172,25 @@ class UserController {
    */
   static async sendPasswordResetLink(req, res) {
     try {
-      const user = req.user;
+      const { user } = req;
       const link = await UserService.sendPasswordResetLink(user);
 
       if (link.error) {
         return Responses.error(res, {
           data: link.error,
-          message: "Error sending password reset link!",
+          message: 'Error sending password reset link!',
           code: 400,
         });
       }
 
       return Responses.success(res, {
         data: link,
-        message: "Reset link sent to email!",
+        message: 'Reset link sent to email!',
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
+        message: 'Server Error!',
         code: 500,
       });
     }
@@ -212,19 +212,19 @@ class UserController {
       if (password_updated.error) {
         return Responses.error(res, {
           data: password_updated.error,
-          message: "Error resetting password!",
+          message: 'Error resetting password!',
           code: 400,
         });
       }
 
       return Responses.success(res, {
         data: null,
-        message: "Password has been reset!",
+        message: 'Password has been reset!',
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
+        message: 'Server Error!',
         code: 500,
       });
     }
@@ -241,27 +241,26 @@ class UserController {
   static async createPin(req, res) {
     try {
       const { id: user_id, email } = req.user;
-      const pin = req.pin;
+      const { pin } = req;
 
-      console.log("Here");
       const pinCreated = await UserService.createPin(pin, user_id, email);
 
       if (pinCreated.error) {
         return Responses.error(res, {
           data: pinCreated.error,
-          message: "Error creating pin!",
+          message: 'Error creating pin!',
           code: 400,
         });
       }
 
       return Responses.success(res, {
         data: pin,
-        message: "Pin created, account has been activated!",
+        message: 'Pin created, account has been activated!',
       });
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server Error!",
+        message: 'Server Error!',
         code: 500,
       });
     }

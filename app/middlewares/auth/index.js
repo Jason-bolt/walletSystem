@@ -1,6 +1,5 @@
-import jwt from "jsonwebtoken";
-import Responses from "../../../config/helpers/responses";
-import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken';
+import Responses from '../../../config/helpers/responses';
 
 /**
  * @class AuthMiddleware
@@ -16,15 +15,15 @@ class AuthMiddleware {
    */
   static async auth(req, res, next) {
     try {
-      const authorization = req.headers.authorization;
+      const { authorization } = req.headers;
       if (!authorization) {
         return Responses.error(res, {
           data: null,
-          message: "Token is missing!",
+          message: 'Token is missing!',
           code: 404,
         });
       }
-      const token = authorization.split(" ")[1];
+      const token = authorization.split(' ')[1];
 
       let error = {};
       jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
@@ -38,7 +37,7 @@ class AuthMiddleware {
       if (error.error) {
         return Responses.error(res, {
           data: error,
-          message: "Token is incorrect or expired!",
+          message: 'Token is incorrect or expired!',
           code: 400,
         });
       }
@@ -46,7 +45,7 @@ class AuthMiddleware {
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server error!",
+        message: 'Server error!',
         code: 500,
       });
     }
@@ -63,12 +62,12 @@ class AuthMiddleware {
    */
   static async refreshToken(req, res, next) {
     try {
-      const refreshToken = req.body.refreshToken;
+      const { refreshToken } = req.body;
 
       if (!refreshToken) {
         return Responses.error(res, {
           data: null,
-          message: "Refresh token is missing!",
+          message: 'Refresh token is missing!',
           code: 400,
         });
       }
@@ -78,15 +77,14 @@ class AuthMiddleware {
       if (!user) {
         return Responses.error(res, {
           data: null,
-          message: "Token is incorrect or expired!",
+          message: 'Token is incorrect or expired!',
           code: 400,
         });
       }
 
-      const newAccessToken = jwt.sign(user, "secret", {
-        expiresIn: "1h",
+      const newAccessToken = jwt.sign(user, 'secret', {
+        expiresIn: '1h',
       });
-      console.log(newAccessToken);
 
       req.user = user;
 
@@ -94,7 +92,7 @@ class AuthMiddleware {
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server error!",
+        message: 'Server error!',
         code: 500,
       });
     }

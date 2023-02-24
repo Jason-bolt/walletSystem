@@ -1,5 +1,5 @@
-import UserController from "./userController.js";
-import AccountController from "./accountController.js";
+import UserController from './userController';
+import AccountController from './accountController';
 
 const Controllers = {
   UserController,

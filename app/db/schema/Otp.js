@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import User from "./User";
+import mongoose from 'mongoose';
+import User from './User';
 
 const { Schema } = mongoose;
 
@@ -22,6 +22,6 @@ const otp_records = new Schema({
   },
 });
 
-const Otp = mongoose.model("Otp", otp_records);
+const Otp = mongoose.model('Otp', otp_records);
 
 export default Otp;

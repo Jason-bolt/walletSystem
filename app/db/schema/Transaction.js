@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import Account from "./Account";
+import mongoose from 'mongoose';
+import Account from './Account';
 
 const { Schema } = mongoose;
 
@@ -23,7 +23,7 @@ const transaction = new Schema(
     },
     type: {
       type: String,
-      default: "transfer",
+      default: 'transfer',
     },
   },
   {
@@ -31,6 +31,6 @@ const transaction = new Schema(
   }
 );
 
-const Transaction = mongoose.model("Transaction", transaction);
+const Transaction = mongoose.model('Transaction', transaction);
 
 export default Transaction;

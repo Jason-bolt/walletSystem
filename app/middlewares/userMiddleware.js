@@ -1,6 +1,6 @@
-import validations from "../validations";
-import Responses from "../../config/helpers/responses";
-import Schemas from "../db/schema";
+import validations from '../validations';
+import Responses from '../../config/helpers/responses';
+import Schemas from '../db/schema';
 
 const { User, Forgot_Password } = Schemas;
 const { UserValidation } = validations;
@@ -10,7 +10,7 @@ const {
   userLoginSchema,
   emailSchema,
   passwordResetSchema,
-  pinSchema,
+  pinSchema
 } = UserValidation;
 
 /**
@@ -28,23 +28,22 @@ class UserMiddleware {
    */
   static async uniqueUser(req, res, next) {
     try {
-      const email = req.body.email;
-      const user = await User.findOne({ email: email }).exec();
+      const { email } = req.body;
+      const user = await User.findOne({ email }).exec();
 
       if (user) {
         return Responses.error(res, {
           data: null,
-          message: "User already exists!",
-          code: 400,
+          message: 'User already exists!',
+          code: 400
         });
-      } else {
-        next();
       }
+      next();
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server error!",
-        code: 500,
+        message: 'Server error!',
+        code: 500
       });
     }
   }
@@ -61,14 +60,14 @@ class UserMiddleware {
   static validateSignUpFields(req, res, next) {
     try {
       const { error } = userSignUpSchema.validate(req.body, {
-        abortEarly: false,
+        abortEarly: false
       });
 
       if (error) {
         return Responses.error(res, {
           data: error.details,
-          message: "Signup validation errors!",
-          code: 400,
+          message: 'Signup validation errors!',
+          code: 400
         });
       }
 
@@ -76,8 +75,8 @@ class UserMiddleware {
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server error!",
-        code: 500,
+        message: 'Server error!',
+        code: 500
       });
     }
   }
@@ -94,14 +93,14 @@ class UserMiddleware {
   static async validateLoginFields(req, res, next) {
     try {
       const { error } = userLoginSchema.validate(req.body, {
-        abortEarly: false,
+        abortEarly: false
       });
 
       if (error) {
         return Responses.error(res, {
           data: error.details,
-          message: "Login validation errors!",
-          code: 400,
+          message: 'Login validation errors!',
+          code: 400
         });
       }
 
@@ -109,8 +108,8 @@ class UserMiddleware {
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server error!",
-        code: 500,
+        message: 'Server error!',
+        code: 500
       });
     }
   }
@@ -127,24 +126,24 @@ class UserMiddleware {
   static async userExists(req, res, next) {
     try {
       const { error } = emailSchema.validate(req.body, {
-        abortEarly: false,
+        abortEarly: false
       });
 
       if (error) {
         return Responses.error(res, {
           data: error.details,
-          message: "Email is missing!",
-          code: 404,
+          message: 'Email is missing!',
+          code: 404
         });
       }
-      const email = req.body.email;
+      const { email } = req.body;
 
       const user = await User.findOne({ email });
       if (!user) {
         return Responses.error(res, {
           data: null,
-          message: "User does not exist!",
-          code: 400,
+          message: 'User does not exist!',
+          code: 400
         });
       }
 
@@ -154,8 +153,8 @@ class UserMiddleware {
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server error!",
-        code: 500,
+        message: 'Server error!',
+        code: 500
       });
     }
   }
@@ -169,6 +168,63 @@ class UserMiddleware {
    * @param {Next} next - callback function that runs when middleware method ends
    * @returns {Promise<Response|next>}
    */
+  // eslint-disable-next-line complexity
+  static async isIdForEmail(req, res, next) {
+    try {
+      const { user_id, email } = req.body;
+
+      if (!user_id) {
+        return Responses.error(res, {
+          data: null,
+          message: 'User ID is missing!',
+          code: 404
+        });
+      }
+      if (!email) {
+        return Responses.error(res, {
+          data: null,
+          message: 'Email is missing!',
+          code: 404
+        });
+      }
+
+      const user = await User.findOne({ email });
+      if (!user) {
+        return Responses.error(res, {
+          data: null,
+          message: 'User does not exist!',
+          code: 400
+        });
+      }
+
+      if (user._id.toString() !== user_id) {
+        return Responses.error(res, {
+          data: null,
+          message: 'ID does not belong to user with email!',
+          code: 400
+        });
+      }
+
+      next();
+    } catch (err) {
+      return Responses.error(res, {
+        data: err,
+        message: 'Server error!',
+        code: 500
+      });
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @memberof UserMiddleware
+   * @param {Request} req - The request from the endpoint
+   * @param {Response} res - The response from the method
+   * @param {Next} next - callback function that runs when middleware method ends
+   * @returns {Promise<Response|next>}
+   */
+  // eslint-disable-next-line max-lines-per-function, complexity
   static async validResetPassword(req, res, next) {
     try {
       const { user_id, token } = req.params;
@@ -176,14 +232,14 @@ class UserMiddleware {
       const data = { user_id, token, password, confirm_password };
 
       const { error } = passwordResetSchema.validate(data, {
-        abortEarly: false,
+        abortEarly: false
       });
 
       if (error) {
         return Responses.error(res, {
           data: error.details,
-          message: "All fields are required!",
-          code: 404,
+          message: 'All fields are required!',
+          code: 404
         });
       }
 
@@ -191,29 +247,29 @@ class UserMiddleware {
       if (!user) {
         return Responses.error(res, {
           data: null,
-          message: "User does not exist!",
-          code: 404,
+          message: 'User does not exist!',
+          code: 404
         });
       }
 
       const forgotPasswordRecord = await Forgot_Password.findOne({
         user_id,
-        token,
+        token
       });
 
       if (!forgotPasswordRecord) {
         return Responses.error(res, {
           data: null,
-          message: "Token is invalid!",
-          code: 400,
+          message: 'Token is invalid!',
+          code: 400
         });
       }
 
       if (Date.now() > forgotPasswordRecord.expireAt) {
         return Responses.error(res, {
           data: null,
-          message: "Link expired!",
-          code: 404,
+          message: 'Link expired!',
+          code: 404
         });
       }
 
@@ -222,8 +278,8 @@ class UserMiddleware {
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server error!",
-        code: 500,
+        message: 'Server error!',
+        code: 500
       });
     }
   }
@@ -239,14 +295,14 @@ class UserMiddleware {
    */
   static async validPin(req, res, next) {
     try {
-      const pin = req.body.pin;
+      const { pin } = req.body;
       const { error } = pinSchema.validate({ pin }, { abortEarly: false });
 
       if (error) {
         return Responses.error(res, {
           data: error.details,
-          message: "Pin is missing!",
-          code: 404,
+          message: 'Pin is missing!',
+          code: 404
         });
       }
 
@@ -255,8 +311,8 @@ class UserMiddleware {
     } catch (err) {
       return Responses.error(res, {
         data: err,
-        message: "Server error!",
-        code: 500,
+        message: 'Server error!',
+        code: 500
       });
     }
   }

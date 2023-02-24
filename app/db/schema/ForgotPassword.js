@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import User from "./User";
+import mongoose from 'mongoose';
+import User from './User';
 
 const { Schema } = mongoose;
 
@@ -22,6 +22,6 @@ const forgot_password = new Schema({
   },
 });
 
-const Forgot_Password = mongoose.model("Forgot_Password", forgot_password);
+const Forgot_Password = mongoose.model('Forgot_Password', forgot_password);
 
 export default Forgot_Password;

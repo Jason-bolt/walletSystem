@@ -1,9 +1,9 @@
-import Schemas from "../db/schema";
-import bcrypt from "bcrypt";
-import helpers from "../../config/helpers";
-import jwt from "jsonwebtoken";
-import middlewares from "../middlewares";
-import crypto from "crypto";
+/* eslint-disable complexity */
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import Schemas from '../db/schema';
+import helpers from '../../config/helpers';
 
 const { EmailHelper, OtpHelper } = helpers;
 
@@ -25,12 +25,12 @@ class UserService {
       const { firstName, lastName, email, phone, password } = user;
       const hashed_password = await bcrypt.hash(password, 10);
       const newUser = await User.create({
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        phone: phone,
+        firstName,
+        lastName,
+        email,
+        phone,
         password: hashed_password,
-        pin: null,
+        pin: null
       });
 
       // Generatting account confirmatory otp
@@ -38,19 +38,18 @@ class UserService {
 
       if (otpObj.error) {
         return { error: otpObj.error };
-      } else {
-        // Adding the user id and token to otp table
-        await Otp.create({
-          user_id: newUser._id,
-          otp: otpObj.hashed_token,
-        });
       }
+      // Adding the user id and token to otp table
+      await Otp.create({
+        user_id: newUser._id,
+        otp: otpObj.hashed_token
+      });
 
       // Sending email to user with token
       const emailSent = await EmailHelper.sendMail({
         email: newUser.email,
-        subject: "Registration successful",
-        text: `Account created, your confirmatory code is ${otpObj.token}. It will expire in 10 minutes.`,
+        subject: 'Registration successful',
+        text: `Account created, your confirmatory code is ${otpObj.token}. It will expire in 10 minutes.`
       });
       if (emailSent.error) {
         return { error: emailSent.error };
@@ -58,7 +57,7 @@ class UserService {
 
       const userObj = {
         id: newUser._id,
-        email: newUser.email,
+        email: newUser.email
       };
       return { userObj };
     } catch (err) {
@@ -79,28 +78,19 @@ class UserService {
       const otpRecord = await Otp.findOne({ user_id });
       if (!otpRecord) {
         return {
-          error: "Account has already been verified, continue to login",
+          error: 'Account has already been verified, continue to login'
         };
-      } else {
-        const tokenVerified = await OtpHelper.verify(token, otpRecord);
-
-        if (tokenVerified.error) {
-          console.log("Here");
-          return { error: tokenVerified.error };
-        } else {
-          console.log(user_id);
-          const updatedUser = await User.updateOne(
-            { _id: user_id },
-            { isVerified: true }
-          );
-          console.log(updatedUser);
-          if (!updatedUser.acknowledged) {
-            return { error: "Could not update user!" };
-          } else {
-            return updatedUser.acknowledged;
-          }
-        }
       }
+      const tokenVerified = await OtpHelper.verify(token, otpRecord);
+
+      if (tokenVerified.error) {
+        return { error: tokenVerified.error };
+      }
+      const updatedUser = await User.updateOne({ _id: user_id }, { isVerified: true });
+      if (!updatedUser.acknowledged) {
+        return { error: 'Could not update user!' };
+      }
+      return updatedUser.acknowledged;
     } catch (err) {
       return { error: err };
     }
@@ -124,21 +114,19 @@ class UserService {
 
       if (otpObj.error) {
         return { error: otpObj.error };
-      } else {
-        // Adding the user id and token to otp table
-        await Otp.create({
-          user_id,
-          otp: otpObj.hashed_token,
-        });
       }
+      // Adding the user id and token to otp table
+      await Otp.create({
+        user_id,
+        otp: otpObj.hashed_token
+      });
 
       // Sending email to user with token
       const emailSent = await EmailHelper.sendMail({
         email,
-        subject: "Confirmatory code resent",
-        text: `Your new confirmatory code is ${otpObj.token}. It will expire in 10 minutes.`,
+        subject: 'Confirmatory code resent',
+        text: `Your new confirmatory code is ${otpObj.token}. It will expire in 10 minutes.`
       });
-      console.log(email);
       if (emailSent.error) {
         return { error: emailSent.error };
       }
@@ -160,37 +148,33 @@ class UserService {
       const { email, password } = user;
       const existingUser = await User.findOne({ email });
       if (!existingUser) {
-        return { error: "Username or password is incorrect!" };
-      } else {
-        const passwordMatch = await bcrypt.compare(
-          password,
-          existingUser.password
-        );
-
-        if (!passwordMatch) {
-          return { error: "Username or password is incorrect!" };
-        }
-
-        const data = {
-          id: existingUser._id,
-          email: existingUser.email,
-          phone: existingUser.phone,
-          firstName: existingUser.firstName,
-          lastName: existingUser.lastName,
-        };
-
-        const jwt_access_token = jwt.sign(data, process.env.JWT_SECRET, {
-          expiresIn: process.env.JWT_TOKEN_EXPIRY,
-        });
-        // const jwt_refresh_token = jwt.sign(data, process.env.JWT_SECRET, {
-        //   expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRY,
-        // });
-
-        return {
-          access_token: jwt_access_token,
-          // refresh_token: jwt_refresh_token,
-        };
+        return { error: 'Username or password is incorrect!' };
       }
+      const passwordMatch = await bcrypt.compare(password, existingUser.password);
+
+      if (!passwordMatch) {
+        return { error: 'Username or password is incorrect!' };
+      }
+
+      const data = {
+        id: existingUser._id,
+        email: existingUser.email,
+        phone: existingUser.phone,
+        firstName: existingUser.firstName,
+        lastName: existingUser.lastName
+      };
+
+      const jwt_access_token = jwt.sign(data, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_TOKEN_EXPIRY
+      });
+      // const jwt_refresh_token = jwt.sign(data, process.env.JWT_SECRET, {
+      //   expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRY,
+      // });
+
+      return {
+        access_token: jwt_access_token
+        // refresh_token: jwt_refresh_token,
+      };
     } catch (err) {
       return { error: err };
     }
@@ -205,26 +189,25 @@ class UserService {
    */
   static async sendPasswordResetLink(user) {
     try {
-      let tokenRecord = await Forgot_Password.findOne({ user_id: user._id });
+      const tokenRecord = await Forgot_Password.findOne({ user_id: user._id });
 
-      let token;
       if (tokenRecord) {
         await Forgot_Password.deleteMany({ user_id: user._id });
       }
 
-      token = crypto.randomBytes(32).toString("hex");
+      const token = crypto.randomBytes(32).toString('hex');
 
       await Forgot_Password.create({
         user_id: user._id,
-        token,
+        token
       });
 
       const link = `${process.env.BASE_URL}/${user._id}/${token}`;
 
       const emailBody = {
         email: user.email,
-        subject: "Reset Password Link",
-        text: `Reset password with this link: ${link} it will expire in 10 minutes.`,
+        subject: 'Reset Password Link',
+        text: `Reset password with this link: ${link} it will expire in 10 minutes.`
       };
       const emailSent = await EmailHelper.sendMail(emailBody);
 
@@ -247,25 +230,20 @@ class UserService {
    */
   static async resetPassword(data) {
     try {
-      const { user_id, token, password, confirm_password } = data;
+      const { user_id, token, password } = data;
 
       const hashed_password = await bcrypt.hash(password, 10);
 
-      const updated = await User.updateOne(
-        { _id: user_id },
-        { password: hashed_password }
-      );
+      const updated = await User.updateOne({ _id: user_id }, { password: hashed_password });
       if (updated.acknowledged) {
         const deleted = await Forgot_Password.deleteMany({ user_id, token });
 
         if (deleted.acknowledged) {
           return true;
-        } else {
-          return { error: "Could not delete forgot password field!" };
         }
-      } else {
-        return { error: "Could not update user!" };
+        return { error: 'Could not delete forgot password field!' };
       }
+      return { error: 'Could not update user!' };
     } catch (err) {
       return { error: err };
     }
@@ -281,19 +259,16 @@ class UserService {
   static async createAccount(userID) {
     try {
       // Create account number
-      const accountNumber = Math.floor(
-        Math.random() * 90000000000 + 10000000000
-      );
+      const accountNumber = Math.floor(Math.random() * 90000000000 + 10000000000);
       const accountCreated = await Account.create({
         accountNumber,
-        user: userID,
+        user: userID
       });
 
       if (accountCreated) {
         return true;
-      } else {
-        return { error: "Could not create account!" };
       }
+      return { error: 'Could not create account!' };
     } catch (err) {
       return { error: err };
     }
@@ -309,36 +284,31 @@ class UserService {
    */
   static async createPin(pin, user_id, email) {
     try {
-      const hashed_pin = await bcrypt.hash(pin, 12);
+      const hashed_pin = bcrypt.hash(pin, 12);
 
       const existingAccount = await Account.findOne({ user: user_id });
       if (existingAccount) {
-        return { error: "Account already created!" };
+        return { error: 'Account already created!' };
       }
 
-      const updated = await User.updateOne(
-        { _id: user_id },
-        { pin: hashed_pin }
-      );
+      const updated = await User.updateOne({ _id: user_id }, { pin: hashed_pin });
 
       if (updated.acknowledged) {
         const accountCreated = await UserService.createAccount(user_id);
         if (accountCreated.error) {
           return { error: accountCreated.error };
-        } else {
-          const emailSent = await EmailHelper.sendMail({
-            email: email,
-            subject: "Account Activated",
-            text: `Congratulations! Your wallet has been activated, here is your account number ${accountCreated.accountNumber}.`,
-          });
-          if (emailSent.error) {
-            return { error: emailSent.error };
-          }
-          return true;
         }
-      } else {
-        return { error: "Could not update user pin!" };
+        const emailSent = await EmailHelper.sendMail({
+          email,
+          subject: 'Account Activated',
+          text: `Congratulations! Your wallet has been activated, here is your account number ${accountCreated.accountNumber}.`
+        });
+        if (emailSent.error) {
+          return { error: emailSent.error };
+        }
+        return true;
       }
+      return { error: 'Could not update user pin!' };
     } catch (err) {
       return { error: err };
     }

@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import User from "./User";
+import mongoose from 'mongoose';
+import User from './User';
 
 const { Schema } = mongoose;
 
@@ -23,6 +23,6 @@ const account = new Schema({
   },
 });
 
-const Account = mongoose.model("Account", account);
+const Account = mongoose.model('Account', account);
 
 export default Account;
